@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { Pedido } from '../../src/models/Pedido';
-import { Expreso, Filtrado, Pasteleria } from '../../src/models/Producto';
+import { Expreso } from '../../src/models/Expreso';
+import { Filtrado } from '../../src/models/Filtrado';
+import { Pasteleria } from '../../src/models/Pasteleria';
 import type { Variedad } from '../../src/models/Variedad';
 
 describe('Pedido.calcularTotal', () => {
