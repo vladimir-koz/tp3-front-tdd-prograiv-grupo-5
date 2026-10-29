@@ -1,8 +1,8 @@
-import { Pedido } from '../models/Pedido';
+import type { DatosPedido } from '../models/Pedido';
 
 export type TipoProducto = 'expreso' | 'filtrado' | 'pasteleria';
 
-export interface PedidoConTotal extends Pedido {
+export interface PedidoConTotal extends DatosPedido {
   total: number;
 }
 

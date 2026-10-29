@@ -3,7 +3,7 @@ import type {
     EstadoPedido,
     ItemPedido,
     NuevoPedido,
-    Pedido
+    DatosPedido
 } from '../models/Pedido';
 
 interface FilaPedido {
@@ -15,7 +15,7 @@ interface FilaPedido {
 export class SqlitePedidoRepository {
     constructor(private readonly db: Database.Database) {}
 
-    create(nuevo: NuevoPedido): Pedido {
+    create(nuevo: NuevoPedido): DatosPedido {
         const insertarPedido = this.db.prepare(
             'INSERT INTO pedidos (mesa) VALUES (?)'
         );
@@ -41,7 +41,7 @@ export class SqlitePedidoRepository {
         return creado;
     }
 
-    findById(id: number): Pedido | undefined {
+    findById(id: number): DatosPedido | undefined {
         const fila = this.db
         .prepare('SELECT id, mesa, estado FROM pedidos WHERE id = ?')
         .get(id) as FilaPedido | undefined;
@@ -63,7 +63,7 @@ export class SqlitePedidoRepository {
             items
         };
     }
-    findAll(mesa?: number): Pedido[] {
+    findAll(mesa?: number): DatosPedido[] {
         const filas = (
             mesa === undefined
                 ? this.db
