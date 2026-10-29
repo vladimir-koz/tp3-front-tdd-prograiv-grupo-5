@@ -1,5 +1,9 @@
 import type Database from 'better-sqlite3';
-import { Expreso, Filtrado, Pasteleria, Producto, Tamano } from '../models/Producto';
+import { Producto } from '../models/Producto';
+import type { Tamano } from '../models/Cafe';
+import { Expreso } from '../models/Expreso';
+import { Filtrado } from '../models/Filtrado';
+import { Pasteleria } from '../models/Pasteleria';
 import { Variedad } from '../models/Variedad';
 
 // Contrato del repositorio de productos: el catálogo es de solo lectura.

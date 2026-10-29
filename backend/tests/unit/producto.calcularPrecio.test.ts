@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { Expreso, Filtrado, Pasteleria, Tamano } from '../../src/models/Producto';
+import { Expreso } from '../../src/models/Expreso';
+import { Filtrado } from '../../src/models/Filtrado';
+import { Pasteleria } from '../../src/models/Pasteleria';
+import type { Tamano } from '../../src/models/Cafe';
 import { Variedad } from '../../src/models/Variedad';
 
 const brasil: Variedad = {

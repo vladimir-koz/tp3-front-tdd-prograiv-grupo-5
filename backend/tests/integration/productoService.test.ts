@@ -2,7 +2,9 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { ProductoServiceImpl } from '../../src/services/ProductoService';
 import { SqliteProductoRepository } from '../../src/repositories/ProductoRepository';
 import { createDb } from '../../src/db/connection';
-import { Expreso, Filtrado, Pasteleria } from '../../src/models/Producto';
+import { Expreso } from '../../src/models/Expreso';
+import { Filtrado } from '../../src/models/Filtrado';
+import { Pasteleria } from '../../src/models/Pasteleria';
 
 describe('ProductoService - listarProductos', () => {
   let service: ProductoServiceImpl;
