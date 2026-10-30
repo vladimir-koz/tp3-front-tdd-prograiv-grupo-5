@@ -1,5 +1,5 @@
 import { Pedido } from '../models/Pedido';
-import type { DatosPedido, NuevoPedido } from '../models/Pedido';
+import type { PedidoPersistido, NuevoPedido, PedidoConTotal } from '../models/Pedido.types';
 import type { Producto } from '../models/Producto';
 import { SqlitePedidoRepository } from '../repositories/PedidoRepository';
 import type { ProductoService } from './ProductoService';
@@ -16,16 +16,16 @@ export class PedidoService {
         private readonly productos: ProductoService
     ) {}
 
-    listarPedidos(mesa?: number): Array<DatosPedido & { total: number }> {
+    listarPedidos(mesa?: number): PedidoConTotal[] {
         return this.pedidos.findAll(mesa).map((pedido) => this.agregarTotal(pedido));
     }
 
-    obtenerPedido(id: number): (DatosPedido & { total: number }) | undefined {
+    obtenerPedido(id: number): PedidoConTotal | undefined {
         const pedido = this.pedidos.findById(id);
         return pedido === undefined ? undefined : this.agregarTotal(pedido);
     }
 
-    crearPedido(nuevo: NuevoPedido): DatosPedido & { total: number } {
+    crearPedido(nuevo: NuevoPedido): PedidoConTotal {
         // Se valida todo antes de guardar, para no dejar pedidos a medias.
         const productos = new Map<number, Producto>();
         const items = nuevo.items.map(item => {
@@ -44,7 +44,7 @@ export class PedidoService {
         return new Pedido(datos.id, datos.mesa, datos.estado, items).toJSON();
     }
 
-    private agregarTotal(datos: DatosPedido): DatosPedido & { total: number } {
+    private agregarTotal(datos: PedidoPersistido): PedidoConTotal {
         const items = datos.items.map(item => {
             const producto = this.productos.obtenerProducto(item.productoId);
             if (producto === undefined) {

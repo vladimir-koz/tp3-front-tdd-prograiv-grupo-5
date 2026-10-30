@@ -2,9 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import {
   ReporteServiceImpl,
   FuentePedidos,
-  FuenteProductos,
-  PedidoConTotal
+  FuenteProductos
 } from '../../src/services/ReporteService';
+import type { PedidoConTotal } from '../../src/models/Pedido.types';
 
 // ReporteService se prueba aislado: los servicios de los que depende se
 // reemplazan por dobles (vi.fn) que devuelven pedidos ya armados.

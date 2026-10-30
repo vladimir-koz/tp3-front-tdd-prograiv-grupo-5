@@ -1,10 +1,5 @@
-import type { DatosPedido } from '../models/Pedido';
-
-export type TipoProducto = 'expreso' | 'filtrado' | 'pasteleria';
-
-export interface PedidoConTotal extends DatosPedido {
-  total: number;
-}
+import type { PedidoConTotal } from '../models/Pedido.types';
+import type { TipoProducto } from '../models/Producto';
 
 export interface FuentePedidos {
   listarPedidos(): PedidoConTotal[];

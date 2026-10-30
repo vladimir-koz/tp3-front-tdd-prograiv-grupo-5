@@ -1,23 +1,5 @@
 import type { Producto } from './Producto';
-
-export type EstadoPedido = 'pendiente' | 'en_preparacion' | 'entregado';
-
-export interface ItemPedido {
-    productoId: number;
-    cantidad: number;
-}
-
-export interface NuevoPedido {
-    mesa?: number | null;
-    items: ItemPedido[];
-}
-
-export interface DatosPedido {
-    id: number;
-    mesa: number | null;
-    items: ItemPedido[];
-    estado: EstadoPedido;
-}
+import type { EstadoPedido, PedidoConTotal } from './Pedido.types';
 
 export class Pedido {
     private readonly itemsInternos: { producto: Producto; cantidad: number }[];
@@ -42,7 +24,7 @@ export class Pedido {
         );
     }
 
-    toJSON(): DatosPedido & { total: number } {
+    toJSON(): PedidoConTotal {
         return {
             id: this.id,
             mesa: this.mesa,
