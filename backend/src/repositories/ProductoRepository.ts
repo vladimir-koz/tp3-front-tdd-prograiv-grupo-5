@@ -6,12 +6,6 @@ import { Filtrado } from '../models/Filtrado';
 import { Pasteleria } from '../models/Pasteleria';
 import { Variedad } from '../models/Variedad';
 
-// Contrato del repositorio de productos: el catálogo es de solo lectura.
-export interface ProductoRepository {
-  findAll(): Producto[];
-  findById(id: number): Producto | undefined;
-}
-
 const SELECT_PRODUCTOS = `
   SELECT p.id, p.tipo, p.nombre, p.precioBase, p.tamano,
          v.id AS variedadId, v.nombre AS variedadNombre, v.precioPorGramo,
@@ -20,7 +14,7 @@ const SELECT_PRODUCTOS = `
   LEFT JOIN variedades v ON v.id = p.variedadId
 `;
 
-export class SqliteProductoRepository implements ProductoRepository {
+export class SqliteProductoRepository {
   constructor(private readonly db: Database.Database) {}
 
   findAll(): Producto[] {

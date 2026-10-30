@@ -3,9 +3,9 @@ import {
   ReporteServiceImpl,
   FuentePedidos,
   FuenteProductos,
-  PedidoConTotal,
-  TipoProducto
+  PedidoConTotal
 } from '../../src/services/ReporteService';
+import type { TipoProducto } from '../../src/models/Producto';
 
 // Productos falsos armados dentro del test: solo aportan id y tipo.
 const catalogo: { id: number; tipo: TipoProducto }[] = [

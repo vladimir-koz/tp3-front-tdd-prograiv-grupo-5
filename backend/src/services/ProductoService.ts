@@ -1,13 +1,8 @@
-import { ProductoRepository } from '../repositories/ProductoRepository';
+import { SqliteProductoRepository } from '../repositories/ProductoRepository';
 import { Producto } from '../models/Producto';
 
-export interface ProductoService {
-  listarProductos(): Producto[];
-  obtenerProducto(id: number): Producto | undefined;
-}
-
-export class ProductoServiceImpl implements ProductoService {
-  constructor(private readonly repo: ProductoRepository) {}
+export class ProductoService {
+  constructor(private readonly repo: SqliteProductoRepository) {}
 
   listarProductos(): Producto[] {
     return this.repo.findAll();
