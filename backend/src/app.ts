@@ -10,6 +10,7 @@ import { ProductoService } from './services/ProductoService';
 import { makeProductosRouter } from './routes/productos';
 import { ReporteServiceImpl } from './services/ReporteService';
 import { makeReportesRouter } from './routes/reportes';
+import { makeTestRouter } from './routes/test';
 
 export function makeApp(db: Database.Database) {
     const app = express();
@@ -27,25 +28,8 @@ export function makeApp(db: Database.Database) {
     app.use('/pedidos', makePedidosRouter(pedidoService));
 
     if (process.env.NODE_ENV === 'test') {
-    app.post('/__test__/reset', (_req, res) => {
-      pedidoRepo.clear();
-      res.sendStatus(204);
-    });
-
-    app.post('/__test__/seed', (_req, res) => {
-      const a = pedidoService.crearPedido({
-        items: [
-          { productoId: 2, cantidad: 2 }, // Expreso Pocillo Colombia
-          { productoId: 19, cantidad: 1 } // Muffin de chocolate
-        ]
-      });
-      const b = pedidoService.crearPedido({
-        items: [{ productoId: 2, cantidad: 1 }],
-        mesa: 7
-      });
-      res.status(201).json({ created: [a, b] });
-    });
-  }
+        app.use('/__test__', makeTestRouter(pedidoRepo, pedidoService));
+    }
     app.use(notFound);
     app.use(errorHandler);
     return app;
