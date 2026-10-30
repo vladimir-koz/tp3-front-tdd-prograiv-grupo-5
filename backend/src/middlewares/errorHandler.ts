@@ -17,6 +17,11 @@ export function errorHandler(error: unknown, _req: Request, res: Response, next:
             'statusCode' in error ? error.statusCode : undefined
         ].find(value => typeof value === 'number' && value >= 400 && value < 600);
 
+        if (status === 413 && 'type' in error && error.type === 'entity.too.large') {
+            res.status(413).json({ error: 'CuerpoDemasiadoGrande' });
+            return;
+        }
+
         if (status !== undefined && status !== 500) {
             next(error);
             return;
