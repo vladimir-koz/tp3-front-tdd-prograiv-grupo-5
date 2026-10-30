@@ -22,8 +22,8 @@ export function errorHandler(error: unknown, _req: Request, res: Response, next:
             return;
         }
 
-        if (status !== undefined && status !== 500) {
-            next(error);
+        if (typeof status === 'number' && status !== 500) {
+            res.status(status).json({ error: 'ErrorHTTP' });
             return;
         }
     }
