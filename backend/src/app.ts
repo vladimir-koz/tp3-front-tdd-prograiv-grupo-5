@@ -1,5 +1,5 @@
 import express from 'express';
-import type { NextFunction, Request, Response } from 'express';
+import { errorHandler } from './middlewares/errorHandler';
 import type Database from 'better-sqlite3';
 import { SqlitePedidoRepository } from './repositories/PedidoRepository';
 import { PedidoService } from './services/PedidoService';
@@ -13,13 +13,6 @@ import { makeReportesRouter } from './routes/reportes';
 export function makeApp(db: Database.Database) {
     const app = express();
     app.use(express.json());
-    app.use((error: unknown, _req: Request, res: Response, next: NextFunction) => {
-        if (error instanceof SyntaxError && 'type' in error && error.type === 'entity.parse.failed') {
-            res.status(400).json({ error: 'DatosInvalidos' });
-            return;
-        }
-        next(error);
-    });
     const productoRepo = new SqliteProductoRepository(db);
     const pedidoRepo = new SqlitePedidoRepository(db);
     
@@ -52,5 +45,6 @@ export function makeApp(db: Database.Database) {
       res.status(201).json({ created: [a, b] });
     });
   }
+    app.use(errorHandler);
     return app;
 }
