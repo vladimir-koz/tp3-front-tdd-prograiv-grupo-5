@@ -1,5 +1,6 @@
 import express from 'express';
 import { errorHandler } from './middlewares/errorHandler';
+import { notFound } from './middlewares/notFound';
 import type Database from 'better-sqlite3';
 import { SqlitePedidoRepository } from './repositories/PedidoRepository';
 import { PedidoService } from './services/PedidoService';
@@ -45,6 +46,7 @@ export function makeApp(db: Database.Database) {
       res.status(201).json({ created: [a, b] });
     });
   }
+    app.use(notFound);
     app.use(errorHandler);
     return app;
 }
