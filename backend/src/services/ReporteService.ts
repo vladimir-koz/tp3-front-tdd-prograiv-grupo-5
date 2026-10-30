@@ -1,9 +1,5 @@
-import type { DatosPedido } from '../models/Pedido';
+import type { PedidoConTotal } from '../models/Pedido.types';
 import type { TipoProducto } from '../models/Producto';
-
-export interface PedidoConTotal extends DatosPedido {
-  total: number;
-}
 
 export interface FuentePedidos {
   listarPedidos(): PedidoConTotal[];

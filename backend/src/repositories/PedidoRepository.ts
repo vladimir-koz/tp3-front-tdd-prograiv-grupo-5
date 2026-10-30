@@ -1,10 +1,10 @@
 import type Database from 'better-sqlite3';
 import type {
     EstadoPedido,
-    ItemPedido,
+    ItemPedidoPorId,
     NuevoPedido,
-    DatosPedido
-} from '../models/Pedido';
+    PedidoPersistido
+} from '../models/Pedido.types';
 
 interface FilaPedido {
     id: number;
@@ -15,7 +15,7 @@ interface FilaPedido {
 export class SqlitePedidoRepository {
     constructor(private readonly db: Database.Database) {}
 
-    create(nuevo: NuevoPedido): DatosPedido {
+    create(nuevo: NuevoPedido): PedidoPersistido {
         const insertarPedido = this.db.prepare(
             'INSERT INTO pedidos (mesa) VALUES (?)'
         );
@@ -41,7 +41,7 @@ export class SqlitePedidoRepository {
         return creado;
     }
 
-    findById(id: number): DatosPedido | undefined {
+    findById(id: number): PedidoPersistido | undefined {
         const fila = this.db
         .prepare('SELECT id, mesa, estado FROM pedidos WHERE id = ?')
         .get(id) as FilaPedido | undefined;
@@ -54,7 +54,7 @@ export class SqlitePedidoRepository {
         .prepare(
             'SELECT productoId, cantidad FROM pedido_items WHERE pedidoId = ? ORDER BY rowid'
         )
-        .all(id) as ItemPedido[];
+        .all(id) as ItemPedidoPorId[];
 
         return {
             id: fila.id,
@@ -63,7 +63,7 @@ export class SqlitePedidoRepository {
             items
         };
     }
-    findAll(mesa?: number): DatosPedido[] {
+    findAll(mesa?: number): PedidoPersistido[] {
         const filas = (
             mesa === undefined
                 ? this.db
@@ -82,7 +82,7 @@ export class SqlitePedidoRepository {
             id: fila.id,
             mesa: fila.mesa,
             estado: fila.estado,
-            items: buscarItems.all(fila.id) as ItemPedido[]
+            items: buscarItems.all(fila.id) as ItemPedidoPorId[]
         }));
     }
 

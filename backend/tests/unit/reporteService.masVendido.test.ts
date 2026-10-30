@@ -2,9 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import {
   ReporteServiceImpl,
   FuentePedidos,
-  FuenteProductos,
-  PedidoConTotal
+  FuenteProductos
 } from '../../src/services/ReporteService';
+import type { PedidoConTotal } from '../../src/models/Pedido.types';
 import type { TipoProducto } from '../../src/models/Producto';
 
 // Productos falsos armados dentro del test: solo aportan id y tipo.
