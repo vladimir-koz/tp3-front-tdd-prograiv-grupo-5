@@ -1,0 +1,44 @@
+import { describe, expect, it } from 'vitest';
+import request from 'supertest';
+import { makeApp } from '../../src/app';
+import { createDb } from '../../src/db/connection';
+
+describe('PATCH /pedidos/:id/estado', () => {
+    it('cambia un pedido pendiente a en_preparacion y conserva sus datos', async () => {
+        const db = createDb(':memory:');
+
+        try {
+            const app = makeApp(db);
+            const creado = await request(app)
+                .post('/pedidos')
+                .send({
+                    mesa: 4,
+                    items: [{ productoId: 19, cantidad: 2 }]
+                });
+
+            expect(creado.status).toBe(201);
+            expect(creado.body).toEqual({
+                id: expect.any(Number),
+                mesa: 4,
+                estado: 'pendiente',
+                items: [{ productoId: 19, cantidad: 2 }],
+                total: 5000
+            });
+
+            const esperado = { ...creado.body, estado: 'en_preparacion' };
+            const actualizado = await request(app)
+                .patch(`/pedidos/${creado.body.id}/estado`)
+                .send({ estado: 'en_preparacion' });
+
+            expect(actualizado.status).toBe(200);
+            expect(actualizado.body).toEqual(esperado);
+
+            const consultado = await request(app).get(`/pedidos/${creado.body.id}`);
+
+            expect(consultado.status).toBe(200);
+            expect(consultado.body).toEqual(esperado);
+        } finally {
+            db.close();
+        }
+    });
+});
