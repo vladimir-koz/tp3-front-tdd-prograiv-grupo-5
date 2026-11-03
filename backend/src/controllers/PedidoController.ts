@@ -65,7 +65,19 @@ export class PedidoController {
         }
 
         const id = Number(req.params.id);
+
+        if (!Number.isSafeInteger(id) || id <= 0) {
+            res.status(400).json({ error: 'DatosInvalidos' });
+            return;
+        }
+
         const pedido = this.servicio.cambiarEstado(id, validacion.data.estado);
+
+        if (pedido === undefined) {
+            res.status(404).json({ error: 'NoEncontrado' });
+            return;
+        }
+
         res.json(pedido);
     };
     crear = (req: Request, res: Response) => {
