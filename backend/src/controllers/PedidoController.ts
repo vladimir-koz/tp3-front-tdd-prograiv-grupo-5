@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { PedidoService, ProductoInexistenteError } from '../services/PedidoService';
+import { MesaInexistenteError } from '../services/MesaInexistenteError';
 import { z } from 'zod';
 
 const crearPedidoSchema = z.object({
@@ -92,6 +93,9 @@ export class PedidoController {
             const pedido = this.servicio.crearPedido(validacion.data);
             res.status(201).json(pedido);
         } catch (e) {
+            if (e instanceof MesaInexistenteError) {
+                return res.status(400).json({ error: 'MesaInexistente' });
+            }
             if (e instanceof ProductoInexistenteError) {
                 return res.status(400).json({ error: 'ProductoInexistente', productoId: e.productoId });
             }

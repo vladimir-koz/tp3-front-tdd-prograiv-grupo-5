@@ -82,6 +82,26 @@ describe('Regresión de creación y recuperación de pedidos', () => {
         }
     });
 
+    it('rechaza una mesa inexistente sin guardar el pedido ni sus ítems', async () => {
+        const db = createDb(':memory:');
+
+        try {
+            const respuesta = await request(makeApp(db)).post('/pedidos').send({
+                mesa: 26,
+                items: [{ productoId: 19, cantidad: 2 }]
+            });
+
+            expect.soft(respuesta.status).toBe(400);
+            expect.soft(respuesta.body).toEqual({ error: 'MesaInexistente' });
+            expect.soft(db.prepare('SELECT COUNT(*) AS cantidad FROM pedidos').get())
+                .toEqual({ cantidad: 0 });
+            expect.soft(db.prepare('SELECT COUNT(*) AS cantidad FROM pedido_items').get())
+                .toEqual({ cantidad: 0 });
+        } finally {
+            db.close();
+        }
+    });
+
     it('rechaza un producto inexistente después de uno válido sin guardar el pedido ni sus ítems', async () => {
         const db = createDb(':memory:');
 
