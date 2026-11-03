@@ -10,6 +10,10 @@ const crearPedidoSchema = z.object({
     })).min(1)
 }).strict();
 
+const cambiarEstadoSchema = z.object({
+    estado: z.enum(['pendiente', 'en_preparacion', 'entregado'])
+}).strict();
+
 export class PedidoController {
     constructor(private readonly servicio: PedidoService) {}
 
@@ -53,8 +57,15 @@ export class PedidoController {
         res.json(pedido);
     };
     cambiarEstado = (req: Request, res: Response): void => {
+        const validacion = cambiarEstadoSchema.safeParse(req.body);
+
+        if (!validacion.success) {
+            res.status(400).json({ error: 'DatosInvalidos' });
+            return;
+        }
+
         const id = Number(req.params.id);
-        const pedido = this.servicio.cambiarEstado(id, req.body.estado);
+        const pedido = this.servicio.cambiarEstado(id, validacion.data.estado);
         res.json(pedido);
     };
     crear = (req: Request, res: Response) => {
