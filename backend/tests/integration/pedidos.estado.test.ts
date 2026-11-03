@@ -41,4 +41,36 @@ describe('PATCH /pedidos/:id/estado', () => {
             db.close();
         }
     });
+    it.each([
+        { caso: 'estado cancelado', cuerpo: { estado: 'cancelado' } },
+        { caso: 'sin estado', cuerpo: {} },
+        { caso: 'propiedad adicional', cuerpo: { estado: 'en_preparacion', mesa: 7 } }
+    ])('rechaza cuerpo inválido: $caso y conserva el estado original', async ({ cuerpo }) => {
+        const db = createDb(':memory:');
+
+        try {
+            const app = makeApp(db);
+            const creado = await request(app)
+                .post('/pedidos')
+                .send({
+                    mesa: 4,
+                    items: [{ productoId: 19, cantidad: 2 }]
+                });
+
+            expect(creado.status).toBe(201);
+            expect(creado.body.estado).toBe('pendiente');
+
+            const respuesta = await request(app)
+                .patch(`/pedidos/${creado.body.id}/estado`)
+                .send(cuerpo);
+            const consultado = await request(app).get(`/pedidos/${creado.body.id}`);
+
+            expect.soft(respuesta.status).toBe(400);
+            expect.soft(respuesta.body).toEqual({ error: 'DatosInvalidos' });
+            expect.soft(consultado.status).toBe(200);
+            expect.soft(consultado.body.estado).toBe('pendiente');
+        } finally {
+            db.close();
+        }
+    });
 });
