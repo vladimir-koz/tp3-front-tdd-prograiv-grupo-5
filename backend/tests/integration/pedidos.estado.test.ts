@@ -73,4 +73,36 @@ describe('PATCH /pedidos/:id/estado', () => {
             db.close();
         }
     });
+    it.each([
+        { id: 'abc', status: 400, error: 'DatosInvalidos' },
+        { id: '0', status: 400, error: 'DatosInvalidos' },
+        { id: '999', status: 404, error: 'NoEncontrado' }
+    ])('rechaza el ID $id con $status sin alterar un pedido existente', async ({ id, status, error }) => {
+        const db = createDb(':memory:');
+
+        try {
+            const app = makeApp(db);
+            const creado = await request(app)
+                .post('/pedidos')
+                .send({
+                    mesa: 4,
+                    items: [{ productoId: 19, cantidad: 2 }]
+                });
+
+            expect(creado.status).toBe(201);
+            expect(creado.body.estado).toBe('pendiente');
+
+            const respuesta = await request(app)
+                .patch(`/pedidos/${id}/estado`)
+                .send({ estado: 'en_preparacion' });
+            const consultado = await request(app).get(`/pedidos/${creado.body.id}`);
+
+            expect.soft(respuesta.status).toBe(status);
+            expect.soft(respuesta.body).toEqual({ error });
+            expect.soft(consultado.status).toBe(200);
+            expect.soft(consultado.body).toEqual(creado.body);
+        } finally {
+            db.close();
+        }
+    });
 });
