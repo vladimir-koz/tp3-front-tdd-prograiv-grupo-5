@@ -6,4 +6,11 @@ export function migrarMesas(db: Database.Database): void {
             id INTEGER PRIMARY KEY
         );
     `);
+
+    const insertar = db.prepare('INSERT OR IGNORE INTO mesas (id) VALUES (?)');
+    db.transaction(() => {
+        for (let id = 1; id <= 25; id++) {
+            insertar.run(id);
+        }
+    })();
 }
