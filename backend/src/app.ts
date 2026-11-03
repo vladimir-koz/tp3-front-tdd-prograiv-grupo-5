@@ -3,6 +3,7 @@ import { errorHandler } from './middlewares/errorHandler';
 import { notFound } from './middlewares/notFound';
 import type Database from 'better-sqlite3';
 import { SqlitePedidoRepository } from './repositories/PedidoRepository';
+import { SqliteMesaRepository } from './repositories/MesaRepository';
 import { PedidoService } from './services/PedidoService';
 import { makePedidosRouter } from './routes/pedidos';
 import { SqliteProductoRepository } from './repositories/ProductoRepository';
@@ -17,9 +18,10 @@ export function makeApp(db: Database.Database) {
     app.use(express.json());
     const productoRepo = new SqliteProductoRepository(db);
     const pedidoRepo = new SqlitePedidoRepository(db);
+    const mesaRepo = new SqliteMesaRepository(db);
     
     const productoService = new ProductoService(productoRepo);
-    const pedidoService = new PedidoService(pedidoRepo, productoService);
+    const pedidoService = new PedidoService(pedidoRepo, productoService, mesaRepo);
     const reporteService = new ReporteServiceImpl(pedidoService, productoService);
 
     app.get('/health', (_req, res) => res.json({ status: 'ok' }));
@@ -28,7 +30,7 @@ export function makeApp(db: Database.Database) {
     app.use('/pedidos', makePedidosRouter(pedidoService));
 
     if (process.env.NODE_ENV === 'test') {
-        app.use('/__test__', makeTestRouter(pedidoRepo, pedidoService));
+        app.use('/__test__', makeTestRouter(pedidoRepo, pedidoService, db));
     }
     app.use(notFound);
     app.use(errorHandler);

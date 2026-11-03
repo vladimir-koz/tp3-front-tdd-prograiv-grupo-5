@@ -124,6 +124,7 @@ describe('POST /pedidos', () => {
         const db = createDb(':memory:');
 
         try {
+            db.prepare('INSERT INTO mesas (id) VALUES (?)').run(7);
             const respuesta = await request(makeApp(db))
                 .post('/pedidos')
                 .send({

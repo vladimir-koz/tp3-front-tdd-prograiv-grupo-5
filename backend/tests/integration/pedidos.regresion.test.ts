@@ -12,6 +12,9 @@ describe('Regresión de creación y recuperación de pedidos', () => {
         const db = createDb(':memory:');
 
         try {
+            if (mesaEsperada !== null) {
+                db.prepare('INSERT INTO mesas (id) VALUES (?)').run(mesaEsperada);
+            }
             const app = makeApp(db);
             const items = [
                 { productoId: 19, cantidad: 1 },
@@ -49,6 +52,7 @@ describe('Regresión de creación y recuperación de pedidos', () => {
         const db = createDb(':memory:');
 
         try {
+            db.prepare('INSERT INTO mesas (id) VALUES (?)').run(7);
             const app = makeApp(db);
             const items = [
                 { productoId: 2, cantidad: 2 },
@@ -86,6 +90,7 @@ describe('Regresión de creación y recuperación de pedidos', () => {
         const db = createDb(':memory:');
 
         try {
+            db.prepare('INSERT INTO mesas (id) VALUES (?)').run(7);
             const app = makeApp(db);
             const respuesta = await request(app).post('/pedidos').send({
                 mesa: 7,
@@ -108,6 +113,7 @@ describe('Regresión de creación y recuperación de pedidos', () => {
         const db = createDb(':memory:');
 
         try {
+            db.prepare('INSERT INTO mesas (id) VALUES (?)').run(7);
             const app = makeApp(db);
             const items = [{ productoId: 19, cantidad: 2 }];
             const creacion = await request(app).post('/pedidos').send({ mesa: 7, items });

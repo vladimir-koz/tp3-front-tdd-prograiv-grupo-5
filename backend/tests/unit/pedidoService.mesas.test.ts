@@ -20,9 +20,9 @@ function prepararServicio(mesaExiste: boolean) {
     };
     const mesas = { existe: vi.fn().mockReturnValue(mesaExiste) };
     const servicio = new PedidoService(
-        pedidos as SqlitePedidoRepository,
-        productos as ProductoService,
-        mesas as SqliteMesaRepository
+        pedidos as unknown as SqlitePedidoRepository,
+        productos as unknown as ProductoService,
+        mesas as unknown as SqliteMesaRepository
     );
 
     return { servicio, pedidos, mesas };

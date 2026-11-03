@@ -3,6 +3,8 @@ import type { PedidoPersistido, NuevoPedido, PedidoConTotal } from '../models/Pe
 import type { Producto } from '../models/Producto';
 import { SqlitePedidoRepository } from '../repositories/PedidoRepository';
 import type { ProductoService } from './ProductoService';
+import type { SqliteMesaRepository } from '../repositories/MesaRepository';
+import { MesaInexistenteError } from './MesaInexistenteError';
 
 export class ProductoInexistenteError extends Error {
   constructor(readonly productoId: number) {
@@ -13,7 +15,8 @@ export class ProductoInexistenteError extends Error {
 export class PedidoService {
     constructor(
         private readonly pedidos: SqlitePedidoRepository,
-        private readonly productos: ProductoService
+        private readonly productos: ProductoService,
+        private readonly mesas: SqliteMesaRepository
     ) {}
 
     listarPedidos(mesa?: number): PedidoConTotal[] {
@@ -26,6 +29,10 @@ export class PedidoService {
     }
 
     crearPedido(nuevo: NuevoPedido): PedidoConTotal {
+        if (nuevo.mesa != null && !this.mesas.existe(nuevo.mesa)) {
+            throw new MesaInexistenteError(nuevo.mesa);
+        }
+
         // Se valida todo antes de guardar, para no dejar pedidos a medias.
         const productos = new Map<number, Producto>();
         const items = nuevo.items.map(item => {
