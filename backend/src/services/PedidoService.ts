@@ -1,5 +1,5 @@
 import { Pedido } from '../models/Pedido';
-import type { EstadoPedido, PedidoPersistido, NuevoPedido, PedidoConTotal } from '../models/Pedido.types';
+import type { EstadoPedido, PedidoPersistido, DatosCreacionPedido, PedidoConTotal } from '../models/Pedido.types';
 import type { Producto } from '../models/Producto';
 import { SqlitePedidoRepository } from '../repositories/PedidoRepository';
 import type { ProductoService } from './ProductoService';
@@ -28,7 +28,7 @@ export class PedidoService {
         return pedido === undefined ? undefined : this.agregarTotal(pedido);
     }
 
-    crearPedido(nuevo: NuevoPedido): PedidoConTotal {
+    crearPedido(nuevo: DatosCreacionPedido): PedidoConTotal {
         if (nuevo.mesa != null && !this.mesas.existe(nuevo.mesa)) {
             throw new MesaInexistenteError(nuevo.mesa);
         }

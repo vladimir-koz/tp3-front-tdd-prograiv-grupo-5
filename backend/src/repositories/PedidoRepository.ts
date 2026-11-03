@@ -2,7 +2,7 @@ import type Database from 'better-sqlite3';
 import type {
     EstadoPedido,
     ItemPedidoPorId,
-    NuevoPedido,
+    DatosCreacionPedido,
     PedidoPersistido
 } from '../models/Pedido.types';
 
@@ -15,7 +15,7 @@ interface FilaPedido {
 export class SqlitePedidoRepository {
     constructor(private readonly db: Database.Database) {}
 
-    create(nuevo: NuevoPedido): PedidoPersistido {
+    create(nuevo: DatosCreacionPedido): PedidoPersistido {
         const insertarPedido = this.db.prepare(
             'INSERT INTO pedidos (mesa) VALUES (?)'
         );

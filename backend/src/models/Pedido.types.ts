@@ -5,7 +5,7 @@ export interface ItemPedidoPorId {
     cantidad: number;
 }
 
-export interface NuevoPedido {
+export interface DatosCreacionPedido {
     mesa?: number | null;
     items: ItemPedidoPorId[];
 }
