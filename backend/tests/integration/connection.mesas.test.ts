@@ -20,6 +20,19 @@ describe('Persistencia de mesas en createDb', () => {
         }
     });
 
+    it('carga inicialmente exactamente las mesas 1 a 25 y no registra la mesa 26', () => {
+        const db = createDb(':memory:');
+
+        try {
+            const esperadas = Array.from({ length: 25 }, (_, indice) => ({ id: indice + 1 }));
+
+            expect.soft(db.prepare('SELECT id FROM mesas ORDER BY id').all()).toEqual(esperadas);
+            expect.soft(db.prepare('SELECT id FROM mesas WHERE id = ?').get(26)).toBeUndefined();
+        } finally {
+            db.close();
+        }
+    });
+
     it('permite insertar y consultar mesas de prueba', () => {
         const db = createDb(':memory:');
 
