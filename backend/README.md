@@ -8,7 +8,7 @@ consultarlos y actualizar su estado. Los reportes se conservan del Parcial I.
 
 ## Stack
 
-- Node.js y npm: verificado con Node 22.12.0 y npm 10.9.0
+- Node.js 22 y npm 10
 - TypeScript estricto + Express 4
 - **SQLite** (`better-sqlite3`)
 - Zod 3 (validación en los bordes)
@@ -25,10 +25,8 @@ npm ci
 npm run dev          # levanta el server en http://localhost:3000
 ```
 
-Todos los comandos siguientes se ejecutan desde `backend/`. Se usa el
-`package-lock.json` con `npm ci`; no se necesita un servidor SQLite externo
-ni un archivo `.env`. `better-sqlite3` es un módulo nativo: si la instalación
-requiere compilarlo, necesita las herramientas de compilación de `node-gyp`.
+Todos los comandos siguientes se ejecutan desde `backend/`. `npm ci` instala
+las versiones del `package-lock.json`. No se necesita un servidor SQLite externo.
 
 Para compilar y ejecutar el resultado:
 
@@ -39,9 +37,8 @@ npm start            # ejecuta dist/src/server.js
 
 El puerto predeterminado es 3000; se puede cambiar mediante `PORT`.
 
-El frontend usa el proxy de `frontend/vite.config.ts` hacia el puerto 3000.
-La API no configura CORS; si se cambia su puerto, hay que ajustar el destino
-del proxy para consumirla desde el frontend.
+El frontend se comunica con la API mediante el proxy de
+`frontend/vite.config.ts`, configurado hacia `http://localhost:3000`.
 
 ## Persistencia y mesas
 
@@ -50,18 +47,15 @@ En desarrollo y en la ejecución compilada se utiliza
 El directorio y el archivo se crean automáticamente y la base no se versiona.
 Con `NODE_ENV=test`, el servidor utiliza SQLite en memoria.
 
-`createDb()` crea las tablas faltantes. Si el catálogo de productos está vacío,
-carga 3 variedades y 20 productos: 18 cafés y 2 productos de pastelería.
-También ejecuta `migrarMesas()`, que crea `mesas` con `id INTEGER PRIMARY KEY`
-y registra los identificadores del 1 al 25 mediante `INSERT OR IGNORE`, dentro
-de una transacción. Las siguientes aperturas no duplican ni borran mesas,
-pedidos o ítems existentes; las mesas adicionales almacenadas se conservan.
+`createDb()` crea las tablas faltantes y, si el catálogo está vacío, carga
+3 variedades y 20 productos: 18 cafés y 2 productos de pastelería.
+La migración de mesas crea la tabla `mesas` y registra los números 1 al 25.
+La inicialización es idempotente: no duplica registros ni elimina mesas
+adicionales, pedidos o ítems existentes.
 
-
-Para crear un pedido, la mesa indicada debe existir en `mesas`.
-`PedidoService` consulta `SqliteMesaRepository` antes de guardar; si no existe,
-rechaza la creación sin insertar el pedido ni sus ítems. Omitir `mesa` o enviar
-`null` significa retiro en barra y no consulta el repositorio de mesas.
+Para crear un pedido, la mesa indicada debe estar registrada. Si no existe,
+la API rechaza el pedido sin guardar datos. Omitir `mesa` o enviar `null`
+indica retiro en barra.
 
 ## Comandos
 
@@ -76,59 +70,17 @@ rechaza la creación sin insertar el pedido ni sus ítems. Omitir `mesa` o envia
 | `npm run test:e2e` | Corre los tests E2E (levanta el server solo para eso) |
 | `npm run report:e2e` | Abre el reporte HTML de Playwright |
 
-## Estructura
+## Organización y precios
 
-```
-src/
-  models/
-    Variedad.ts             # Variedad de café (precio por gramo, acidez, cuerpo, notas)
-    Producto.ts             # Producto (abstracta) → Cafe → Expreso / Filtrado, y Pasteleria
-    Pedido.ts               # Pedido, ItemPedido, mesa opcional y estados
-  db/connection.ts          # Abre SQLite, crea tablas e inicializa datos
-  db/migracionMesas.ts      # Crea mesas y registra 1 a 25 sin duplicarlas
-  repositories/
-    ProductoRepository.ts   # Catálogo (solo lectura) → instancia la subclase correcta
-    PedidoRepository.ts     # Pedidos + items (alta en transacción)
-    MesaRepository.ts       # Consulta de existencia de mesas
-  services/
-    ProductoService.ts      # Listar / obtener productos
-    PedidoService.ts        # Pedidos, existencia de mesas, total y cambio de estado
-    MesaInexistenteError.ts # Error de negocio por mesa no registrada
-    ReporteService.ts       # Facturación, cantidad vendida, más vendido
-  controllers/              # Validación con Zod (safeParse) + códigos HTTP
-  routes/                   # Solo ruteo: endpoint → método del controller
-  app.ts / server.ts        # makeApp(db) recibe la conexión; server.ts inicia el servidor
-tests/unit/                 # Precios, pedidos y reportes; dependencias con dobles
-tests/integration/          # SQLite, servicios con repositorios y rutas HTTP con Supertest
-e2e/                        # Flujo completo con Playwright
-```
+`src/` separa modelos, repositorios SQLite, servicios, controladores y rutas.
+Los controladores validan los datos con Zod y los servicios comprueban la
+existencia de mesas y productos antes de guardar el pedido.
 
-## Decisiones de diseño
-
-- **`calcularPrecio()` polimórfico.** `Producto` es una clase abstracta con
-  `id`, `nombre` y `precioBase`. Cada subclase sabe calcular su precio:
-  - `Cafe` (abstracta): `precioBase + gramos × variedad.precioPorGramo`.
-    `Expreso` (18 / 27 / 36 g) y `Filtrado` (6 / 15 / 25 g) solo definen
-    cuántos gramos usa cada tamaño (*Pocillo*, *Mediano*, *Taza grande*).
-  - `Pasteleria`: el precio es el `precioBase`.
-
-  Pedidos y reportes llaman a `calcularPrecio()` sin preguntar qué tipo de
-  producto es.
-- **Un producto por cada combinación de la tabla.** El catálogo tiene 20
-  productos: 9 expresos y 9 filtrados (tamaño × variedad), más 2 de
-  pastelería. Un ítem del pedido referencia un único `productoId` y el precio
-  queda definido sin parámetros extra.
-- **El total no se guarda, se calcula.** Cada vez que se lee un pedido se
-  calcula con `calcularPrecio() × cantidad`. Si cambia el precio del catálogo,
-  cambiaría también el total de pedidos anteriores; el catálogo es fijo en
-  esta versión. La facturación suma todos los pedidos, incluso los pendientes.
-- **Los reportes se construyen sobre los servicios.** `ReporteService`
-  depende de `PedidoService` y `ProductoService` (no de los repositorios).
-  Suma cantidades por tipo: Expreso, Filtrado y Pastelería. Muffin y torta
-  se cuentan juntos. Los tests unitarios usan dobles con `vi.fn()`.
-- **Validación en el borde.** Los controllers validan con Zod usando
-  `safeParse`. Los servicios asumen que reciben datos con la forma correcta
-  y solo validan reglas de negocio, por ejemplo que el producto exista.
+Cada combinación de bebida, tamaño y origen tiene su propio `productoId`.
+El precio del café se calcula como `precioBase + gramos × precioPorGramo`;
+en pastelería es el `precioBase`. El total del pedido es la suma de precios
+por cantidades. No se almacena: se recalcula con los precios actuales al
+consultar el pedido.
 
 ## Endpoints
 
@@ -145,9 +97,6 @@ e2e/                        # Flujo completo con Playwright
 | GET | `/reportes/cantidades` | 200 — `{ "Expreso": 10, "Pastelería": 3 }` |
 | GET | `/reportes/mas-vendido` | 200 — `{ tipo, cantidad }` · 404 `{ error: "SinVentas" }` |
 
-PATCH y los reportes son funcionalidades adicionales a los cambios de API
-pedidos por el TP3. Para consultar el estado se usa `GET /pedidos/:id`.
-
 **Nuevo pedido:** `{ mesa?, items: [{ productoId, cantidad }] }`
 
 - `mesa`: se puede omitir o enviar `null` para barra o para llevar. Si se
@@ -161,17 +110,16 @@ pedidos por el TP3. Para consultar el estado se usa `GET /pedidos/:id`.
   pedidos con distintos IDs.
 
 POST y PATCH rechazan propiedades adicionales en el objeto principal del
-cuerpo. PATCH exige exactamente `{ "estado": "en_preparacion" }`, con uno de
-estos valores: `pendiente`, `en_preparacion` o `entregado`. No admite
-`cancelado` ni impone reglas de transición entre los tres estados.
+cuerpo. PATCH recibe únicamente `estado`, con uno de estos valores:
+`pendiente`, `en_preparacion` o `entregado`. Se permite cambiar entre ellos
+sin restricciones de transición.
 
 Los IDs de pedido y el filtro `?mesa=` deben ser enteros positivos seguros;
 si son inválidos, la respuesta es 400. El filtro lista pedidos por número de
 mesa: no verifica su existencia y devuelve `[]` si no hay coincidencias.
 
-Los nombres del contrato son `mesa`, `tamano` y `gramos`, en lugar de
-`mesaId`, `tamanio` y `gramosCafe` del ejemplo de la consigna. La información
-se conserva. Los cafés incluyen `variedad` con acidez, cuerpo y notas.
+El contrato usa los nombres `mesa`, `tamano` y `gramos`. Los cafés incluyen
+`variedad` con acidez, cuerpo y notas.
 
 ### Ids del catálogo
 
@@ -256,13 +204,6 @@ GET individual y PATCH devuelven el pedido completo con el mismo formato.
 El PATCH responde 200, conserva ID, mesa, ítems y total, y cambia `estado`
 a `en_preparacion`. Un GET posterior refleja ese cambio.
 
-En PowerShell, el mismo POST y PATCH se pueden ejecutar así:
-
-```powershell
-Invoke-RestMethod -Method Post -Uri http://localhost:3000/pedidos -ContentType 'application/json' -Body '{"mesa":4,"items":[{"productoId":5,"cantidad":2},{"productoId":19,"cantidad":1}]}'
-Invoke-RestMethod -Method Patch -Uri http://localhost:3000/pedidos/1/estado -ContentType 'application/json' -Body '{"estado":"en_preparacion"}'
-```
-
 Para barra, usar el mismo POST omitiendo `mesa` o con `"mesa": null`.
 
 ### Reportes
@@ -311,31 +252,21 @@ Un pedido rechazado por mesa o producto inexistente no inserta pedidos ni ítems
 npm test                              # unitarios e integración
 npm test -- tests/unit                # solo unitarios
 npm test -- tests/integration         # solo integración
-npm run test:watch
-npm run coverage
 npm run test:e2e
 ```
 
 - **Unitarios:** precios, total del pedido, reportes y existencia de mesas
   en `PedidoService`, con dobles donde corresponde.
 - **Integración:** repositorios, inicialización y persistencia SQLite, y rutas
-  HTTP con Supertest. Usan `makeApp(createDb(':memory:'))` o archivos temporales
-  para las pruebas de reapertura, sin necesitar una API levantada.
+  HTTP con Supertest. Usan bases en memoria o archivos temporales, sin necesitar
+  una API levantada.
 - **E2E:** Playwright realiza peticiones HTTP contra la API real en el puerto
   4000. Comprueba un recorrido de catálogo, pedido y reportes, y el rechazo de
-  un producto inexistente. Estos E2E no abren un navegador ni prueban el frontend;
-  no requieren descargar navegadores de Playwright.
+  un producto inexistente. Son pruebas de la API, sin navegador.
 
 Playwright inicia `npm run start:e2e`, que configura `NODE_ENV=test` y
-`PORT=4000`. Antes de cada test llama a reset y seed. Sin `CI`, puede reutilizar
-un servidor existente en ese puerto; para exigir uno propio, dejar libre el
-puerto y ejecutar en Bash `CI=true npm run test:e2e`, o en PowerShell:
-
-```powershell
-$env:CI = 'true'
-npm run test:e2e
-Remove-Item Env:CI
-```
+`PORT=4000`. Antes de cada test llama a reset y seed. Para evitar reutilizar
+otro servidor, dejar libre el puerto 4000 antes de ejecutar los E2E.
 
 ### Rutas exclusivas de test
 
@@ -349,7 +280,6 @@ curl -X POST http://localhost:4000/__test__/seed
 
 - `POST /__test__/reset`: 204 sin cuerpo; borra pedidos e ítems, conservando
   productos y mesas.
-- `POST /__test__/seed`: 201 con una propiedad `created` que contiene los dos
-  pedidos creados. Registra las mesas de prueba 4 y 7 si faltan y crea un pedido
-  de barra por 13980 y uno de mesa 7 por 5740. Seed agrega datos: usar reset
-  antes para obtener siempre el mismo escenario.
+- `POST /__test__/seed`: 201 con `{ "created": [...] }`; crea dos pedidos de
+  prueba, uno de barra y otro de mesa 7. Usar reset antes de seed para obtener
+  siempre el mismo escenario.
