@@ -86,6 +86,12 @@ export class SqlitePedidoRepository {
         }));
     }
 
+    actualizarEstado(id: number, estado: EstadoPedido): void {
+        this.db
+        .prepare('UPDATE pedidos SET estado = ? WHERE id = ?')
+        .run(estado, id);
+    }
+
     clear(): void {
         this.db.exec(`DELETE FROM pedido_items; DELETE FROM pedidos;`);
     }

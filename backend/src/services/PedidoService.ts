@@ -1,5 +1,5 @@
 import { Pedido } from '../models/Pedido';
-import type { PedidoPersistido, NuevoPedido, PedidoConTotal } from '../models/Pedido.types';
+import type { EstadoPedido, PedidoPersistido, NuevoPedido, PedidoConTotal } from '../models/Pedido.types';
 import type { Producto } from '../models/Producto';
 import { SqlitePedidoRepository } from '../repositories/PedidoRepository';
 import type { ProductoService } from './ProductoService';
@@ -42,6 +42,11 @@ export class PedidoService {
 
         const datos = this.pedidos.create(nuevo);
         return new Pedido(datos.id, datos.mesa, datos.estado, items).toJSON();
+    }
+
+    cambiarEstado(id: number, estado: EstadoPedido): PedidoConTotal | undefined {
+        this.pedidos.actualizarEstado(id, estado);
+        return this.obtenerPedido(id);
     }
 
     private agregarTotal(datos: PedidoPersistido): PedidoConTotal {

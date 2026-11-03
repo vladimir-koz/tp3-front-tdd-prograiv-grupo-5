@@ -9,6 +9,7 @@ export function makePedidosRouter(servicio: PedidoService) {
     router.get('/', controlador.listar);
     router.get('/:id', controlador.obtenerPorId);
     router.post('/', controlador.crear);
+    router.patch('/:id/estado', controlador.cambiarEstado);
 
     return router;
 }
