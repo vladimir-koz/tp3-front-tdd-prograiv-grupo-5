@@ -52,6 +52,11 @@ export class PedidoController {
 
         res.json(pedido);
     };
+    cambiarEstado = (req: Request, res: Response): void => {
+        const id = Number(req.params.id);
+        const pedido = this.servicio.cambiarEstado(id, req.body.estado);
+        res.json(pedido);
+    };
     crear = (req: Request, res: Response) => {
         const validacion = crearPedidoSchema.safeParse(req.body);
 
