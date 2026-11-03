@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import { migrarMesas } from './migracionMesas';
 
 export function createDb(path: string = ':memory:'): Database.Database{
     const db=new Database(path);
@@ -35,6 +36,7 @@ export function createDb(path: string = ':memory:'): Database.Database{
             cantidad INTEGER NOT NULL CHECK (cantidad > 0)
         );
     `);
+    migrarMesas(db);
     const yaHayProductos=db.prepare('SELECT 1 FROM productos LIMIT 1').get();
 
     if(yaHayProductos===undefined){
