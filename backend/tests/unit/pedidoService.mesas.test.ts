@@ -1,14 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 import { PedidoService } from '../../src/services/PedidoService';
 import { Pasteleria } from '../../src/models/Pasteleria';
-import type { NuevoPedido, PedidoPersistido } from '../../src/models/Pedido.types';
+import type { DatosCreacionPedido, PedidoPersistido } from '../../src/models/Pedido.types';
 import type { SqlitePedidoRepository } from '../../src/repositories/PedidoRepository';
 import type { SqliteMesaRepository } from '../../src/repositories/MesaRepository';
 import type { ProductoService } from '../../src/services/ProductoService';
 
 function prepararServicio(mesaExiste: boolean) {
     const pedidos = {
-        create: vi.fn((nuevo: NuevoPedido): PedidoPersistido => ({
+        create: vi.fn((nuevo: DatosCreacionPedido): PedidoPersistido => ({
             id: 1,
             mesa: nuevo.mesa ?? null,
             estado: 'pendiente',
