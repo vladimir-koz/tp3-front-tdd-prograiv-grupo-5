@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 const ProductoBaseSchema = z.object({
-  id: z.number().int(),
+  id: z.number().int().positive(),
   nombre: z.string(),
-  precio: z.number()
+  precio: z.number().nonnegative()
 });
 
 const CafeBaseSchema = ProductoBaseSchema.extend({
