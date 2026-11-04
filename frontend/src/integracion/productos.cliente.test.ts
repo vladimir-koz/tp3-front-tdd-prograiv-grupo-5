@@ -46,3 +46,19 @@ it('rechaza una respuesta 200 que contiene un producto inválido', async () => {
 
   await expect(obtenerProductos()).rejects.toThrow();
 });
+
+it('conserva el mensaje de la API cuando GET /productos responde 500', async () => {
+  server.use(
+    http.get('*/productos', () =>
+      HttpResponse.json({ error: 'ErrorInterno' }, { status: 500 })
+    )
+  );
+
+  await expect(obtenerProductos()).rejects.toThrow('ErrorInterno');
+});
+
+it('rechaza con un mensaje comprensible cuando falla la conexión', async () => {
+  server.use(http.get('*/productos', () => HttpResponse.error()));
+
+  await expect(obtenerProductos()).rejects.toThrow('No se pudo conectar con el servidor');
+});
