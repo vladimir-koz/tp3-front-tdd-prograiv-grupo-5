@@ -1,3 +1,4 @@
 export function leerMesa(search: string): number | null {
-  return Number(new URLSearchParams(search).get('mesa'));
+  const mesa = Number(new URLSearchParams(search).get('mesa'));
+  return Number.isSafeInteger(mesa) && mesa > 0 ? mesa : null;
 }
