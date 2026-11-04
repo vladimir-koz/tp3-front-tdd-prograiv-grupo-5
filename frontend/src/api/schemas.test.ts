@@ -95,3 +95,27 @@ it('valida el muffin de chocolate sin campos de café', () => {
     precio: 2500
   });
 });
+
+it('rechaza un producto con precio negativo', () => {
+  const resultado = ProductoSchema.safeParse({
+    id: 19,
+    tipo: 'pasteleria',
+    nombre: 'Muffin de chocolate',
+    precioBase: 2500,
+    precio: -1
+  });
+
+  expect(resultado.success).toBe(false);
+});
+
+it('rechaza un producto con id igual a cero', () => {
+  const resultado = ProductoSchema.safeParse({
+    id: 0,
+    tipo: 'pasteleria',
+    nombre: 'Muffin de chocolate',
+    precioBase: 2500,
+    precio: 2500
+  });
+
+  expect(resultado.success).toBe(false);
+});
