@@ -5,14 +5,14 @@ import { useMenu } from './menu/useMenu';
 
 export function App() {
   const mesa = leerMesa(window.location.search);
-  const { estado } = useMenu();
+  const { estado, reintentar } = useMenu();
 
   return (
     <>
       <Encabezado mesa={mesa} />
       <main className="container py-4">
         <h1>Cafetería Origen</h1>
-        <Menu estado={estado} />
+        <Menu estado={estado} onReintentar={reintentar} />
       </main>
     </>
   );
