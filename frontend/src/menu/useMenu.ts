@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { obtenerProductos } from '../api/cliente';
 import type { Producto } from '../api/schemas';
 
 export type EstadoMenu =
@@ -5,5 +7,13 @@ export type EstadoMenu =
   | { estado: 'listo'; productos: Producto[] };
 
 export function useMenu(): { estado: EstadoMenu } {
-  return { estado: { estado: 'cargando' } };
+  const [estado, setEstado] = useState<EstadoMenu>({ estado: 'cargando' });
+
+  useEffect(() => {
+    obtenerProductos().then(productos => {
+      setEstado({ estado: 'listo', productos });
+    });
+  }, []);
+
+  return { estado };
 }
