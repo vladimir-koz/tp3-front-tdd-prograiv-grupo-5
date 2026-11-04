@@ -1,6 +1,12 @@
 import { render, screen, within } from '@testing-library/react';
-import { expect, it } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { beforeEach, expect, it } from 'vitest';
 import { App } from './App';
+import { server } from './test/server';
+
+beforeEach(() => {
+  server.use(http.get('*/productos', () => HttpResponse.json([])));
+});
 
 it('renderiza la aplicación React', () => {
   render(<App />);
