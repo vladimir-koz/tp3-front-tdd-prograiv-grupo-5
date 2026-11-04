@@ -1,3 +1,3 @@
-export function leerMesa(_search: string): number | null {
-  return null;
+export function leerMesa(search: string): number | null {
+  return Number(new URLSearchParams(search).get('mesa'));
 }
