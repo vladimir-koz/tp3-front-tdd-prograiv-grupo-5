@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { ProductoSchema } from './schemas';
+import { ProductoSchema, ProductosSchema } from './schemas';
 
 it('valida el producto 5 del catálogo oficial y conserva los campos que utiliza el menú', () => {
   const respuestaApi: unknown = {
@@ -118,4 +118,45 @@ it('rechaza un producto con id igual a cero', () => {
   });
 
   expect(resultado.success).toBe(false);
+});
+
+const productosValidos = [
+  {
+    id: 5,
+    tipo: 'expreso',
+    nombre: 'Expreso Mediano Colombia',
+    precioBase: 2500,
+    tamano: 'Mediano',
+    gramos: 27,
+    variedad: {
+      id: 2,
+      nombre: 'Colombia',
+      precioPorGramo: 180,
+      acidez: 'media',
+      cuerpo: 'equilibrado',
+      notas: 'cítricas y florales'
+    },
+    precio: 7360
+  },
+  {
+    id: 19,
+    tipo: 'pasteleria',
+    nombre: 'Muffin de chocolate',
+    precioBase: 2500,
+    precio: 2500
+  }
+];
+
+it('acepta una lista con productos válidos de distintos tipos', () => {
+  expect(ProductosSchema.safeParse(productosValidos).success).toBe(true);
+});
+
+it('rechaza una lista que contiene un producto inválido', () => {
+  const respuestaApi = [productosValidos[0], { ...productosValidos[1], precio: -1 }];
+
+  expect(ProductosSchema.safeParse(respuestaApi).success).toBe(false);
+});
+
+it('rechaza una respuesta de productos que no es un array', () => {
+  expect(ProductosSchema.safeParse(productosValidos[0]).success).toBe(false);
 });

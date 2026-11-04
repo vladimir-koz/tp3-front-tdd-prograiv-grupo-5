@@ -24,4 +24,6 @@ export const ProductoSchema = z.discriminatedUnion('tipo', [
   ProductoBaseSchema.extend({ tipo: z.literal('pasteleria') })
 ]);
 
+export const ProductosSchema = z.array(z.unknown());
+
 export type Producto = z.infer<typeof ProductoSchema>;
