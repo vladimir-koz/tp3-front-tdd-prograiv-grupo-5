@@ -32,3 +32,19 @@ it('comienza cargando y pasa a listo con los productos validados', async () => {
     });
   });
 });
+
+it('comienza cargando y pasa a error con el mensaje de la API ante un HTTP 500', async () => {
+  server.use(
+    http.get('*/productos', () =>
+      HttpResponse.json({ error: 'ErrorInterno' }, { status: 500 })
+    )
+  );
+
+  const { result } = renderHook(() => useMenu());
+
+  expect(result.current.estado).toEqual({ estado: 'cargando' });
+
+  await waitFor(() => {
+    expect(result.current.estado).toEqual({ estado: 'error', mensaje: 'ErrorInterno' });
+  });
+});
