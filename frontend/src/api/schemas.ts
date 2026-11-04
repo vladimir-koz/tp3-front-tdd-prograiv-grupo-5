@@ -1,10 +1,12 @@
 import { z } from 'zod';
 
-export const ProductoSchema = z.object({
+const ProductoBaseSchema = z.object({
   id: z.number().int(),
-  tipo: z.literal('expreso'),
   nombre: z.string(),
-  precio: z.number(),
+  precio: z.number()
+});
+
+const CafeBaseSchema = ProductoBaseSchema.extend({
   tamano: z.enum(['Pocillo', 'Mediano', 'Taza grande']),
   gramos: z.number(),
   variedad: z.object({
@@ -15,5 +17,11 @@ export const ProductoSchema = z.object({
     notas: z.string()
   })
 });
+
+export const ProductoSchema = z.discriminatedUnion('tipo', [
+  CafeBaseSchema.extend({ tipo: z.literal('expreso') }),
+  CafeBaseSchema.extend({ tipo: z.literal('filtrado') }),
+  ProductoBaseSchema.extend({ tipo: z.literal('pasteleria') })
+]);
 
 export type Producto = z.infer<typeof ProductoSchema>;
