@@ -1,7 +1,15 @@
+import { Encabezado } from './componentes/Encabezado';
+import { leerMesa } from './dominio/mesa';
+
 export function App() {
+  const mesa = leerMesa(window.location.search);
+
   return (
-    <main className="container py-4">
-      <h1>Cafetería Origen</h1>
-    </main>
+    <>
+      <Encabezado mesa={mesa} />
+      <main className="container py-4">
+        <h1>Cafetería Origen</h1>
+      </main>
+    </>
   );
 }
