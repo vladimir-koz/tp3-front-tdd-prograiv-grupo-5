@@ -7,7 +7,7 @@ export type EstadoMenu =
   | { estado: 'error'; mensaje: string }
   | { estado: 'listo'; productos: Producto[] };
 
-export function useMenu(): { estado: EstadoMenu } {
+export function useMenu(): { estado: EstadoMenu; reintentar: () => void } {
   const [estado, setEstado] = useState<EstadoMenu>({ estado: 'cargando' });
 
   useEffect(() => {
@@ -24,5 +24,7 @@ export function useMenu(): { estado: EstadoMenu } {
     );
   }, []);
 
-  return { estado };
+  function reintentar() {}
+
+  return { estado, reintentar };
 }
