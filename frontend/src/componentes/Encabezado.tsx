@@ -1,3 +1,3 @@
 export function Encabezado({ mesa }: { mesa: number | null }) {
-  return <header>Mesa {mesa}</header>;
+  return <header>{mesa === null ? 'Retiro en barra' : `Mesa ${mesa}`}</header>;
 }
