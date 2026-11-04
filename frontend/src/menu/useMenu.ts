@@ -9,6 +9,7 @@ export type EstadoMenu =
 
 export function useMenu(): { estado: EstadoMenu; reintentar: () => void } {
   const [estado, setEstado] = useState<EstadoMenu>({ estado: 'cargando' });
+  const [intento, setIntento] = useState(0);
 
   useEffect(() => {
     obtenerProductos().then(
@@ -22,9 +23,12 @@ export function useMenu(): { estado: EstadoMenu; reintentar: () => void } {
         });
       }
     );
-  }, []);
+  }, [intento]);
 
-  function reintentar() {}
+  function reintentar() {
+    setEstado({ estado: 'cargando' });
+    setIntento(anterior => anterior + 1);
+  }
 
   return { estado, reintentar };
 }
