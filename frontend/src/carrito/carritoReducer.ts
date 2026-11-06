@@ -16,6 +16,29 @@ export type AccionCarrito =
   | { tipo: 'quitar'; id: number }
   | { tipo: 'vaciar' };
 
-export function carritoReducer(estado: EstadoCarrito, _accion: AccionCarrito): EstadoCarrito {
-  return estado;
+function cambiarCantidad(estado: EstadoCarrito, id: number, delta: number): EstadoCarrito {
+  return estado
+    .map(item => (item.producto.id === id ? { ...item, cantidad: item.cantidad + delta } : item))
+    .filter(item => item.cantidad > 0);
+}
+
+export function carritoReducer(estado: EstadoCarrito, accion: AccionCarrito): EstadoCarrito {
+  switch (accion.tipo) {
+    case 'agregar': {
+      const { id, nombre, precio } = accion.producto;
+      const yaEsta = estado.some(item => item.producto.id === id);
+      return yaEsta
+        ? cambiarCantidad(estado, id, 1)
+        : [...estado, { producto: { id, nombre, precio }, cantidad: 1 }];
+    }
+    case 'sumar':
+      return cambiarCantidad(estado, accion.id, 1);
+    case 'restar':
+      // Con cantidad 1, restar quita el producto del carrito.
+      return cambiarCantidad(estado, accion.id, -1);
+    case 'quitar':
+      return estado.filter(item => item.producto.id !== accion.id);
+    case 'vaciar':
+      return [];
+  }
 }
