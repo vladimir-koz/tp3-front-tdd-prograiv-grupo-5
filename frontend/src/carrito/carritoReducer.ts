@@ -43,10 +43,11 @@ export function carritoReducer(estado: EstadoCarrito, accion: AccionCarrito): Es
   }
 }
 
-export function subtotalItem(_item: ItemCarrito): number {
-  return 0;
+// Subtotales orientativos: el total real del pedido lo calcula la API.
+export function subtotalItem(item: ItemCarrito): number {
+  return item.producto.precio * item.cantidad;
 }
 
-export function subtotalCarrito(_estado: EstadoCarrito): number {
-  return 0;
+export function subtotalCarrito(estado: EstadoCarrito): number {
+  return estado.reduce((suma, item) => suma + subtotalItem(item), 0);
 }
