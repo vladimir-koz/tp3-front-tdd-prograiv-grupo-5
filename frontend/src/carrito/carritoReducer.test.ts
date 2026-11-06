@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { carritoReducer, type EstadoCarrito } from './carritoReducer';
+import {
+  carritoReducer,
+  subtotalCarrito,
+  subtotalItem,
+  type EstadoCarrito
+} from './carritoReducer';
 
 const expreso = { id: 5, nombre: 'Expreso Mediano Colombia', precio: 7360 };
 const muffin = { id: 19, nombre: 'Muffin de chocolate', precio: 2500 };
 
-// Estado congelado: si el reducer lo mutara, lanzaría un error.
 const conExpresoYMuffin: EstadoCarrito = Object.freeze([
   Object.freeze({ producto: expreso, cantidad: 2 }),
   Object.freeze({ producto: muffin, cantidad: 1 })
@@ -55,5 +59,25 @@ describe('carritoReducer', () => {
 
   it('vaciar deja el carrito sin productos', () => {
     expect(carritoReducer(conExpresoYMuffin, { tipo: 'vaciar' })).toEqual([]);
+  });
+
+  it('no muta el estado anterior', () => {
+    carritoReducer(conExpresoYMuffin, { tipo: 'sumar', id: 5 });
+    carritoReducer(conExpresoYMuffin, { tipo: 'agregar', producto: expreso });
+    expect(conExpresoYMuffin[0].cantidad).toBe(2);
+  });
+});
+
+describe('subtotales orientativos', () => {
+  it('el subtotal de un ítem es precio por cantidad', () => {
+    expect(subtotalItem(conExpresoYMuffin[0])).toBe(14720);
+  });
+
+  it('el subtotal del carrito suma todos los ítems', () => {
+    expect(subtotalCarrito(conExpresoYMuffin)).toBe(17220);
+  });
+
+  it('el subtotal de un carrito vacío es 0', () => {
+    expect(subtotalCarrito([])).toBe(0);
   });
 });

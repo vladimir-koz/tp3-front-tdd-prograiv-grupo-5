@@ -42,3 +42,11 @@ export function carritoReducer(estado: EstadoCarrito, accion: AccionCarrito): Es
       return [];
   }
 }
+
+export function subtotalItem(_item: ItemCarrito): number {
+  return 0;
+}
+
+export function subtotalCarrito(_estado: EstadoCarrito): number {
+  return 0;
+}
