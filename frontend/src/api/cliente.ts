@@ -1,4 +1,4 @@
-import { ProductosSchema, type Pedido, type Producto } from './schemas';
+import { PedidoSchema, ProductosSchema, type Pedido, type Producto } from './schemas';
 
 export async function obtenerProductos(): Promise<Producto[]> {
   let respuesta: Response;
@@ -22,6 +22,13 @@ export async function obtenerProductos(): Promise<Producto[]> {
   return ProductosSchema.parse(datos);
 }
 
-export async function crearPedido(_nuevoPedido: Pick<Pedido, 'mesa' | 'items'>): Promise<Pedido> {
-  throw new Error('Pendiente de implementar crearPedido');
+export async function crearPedido(nuevoPedido: Pick<Pedido, 'mesa' | 'items'>): Promise<Pedido> {
+  const respuesta = await fetch(new URL('/pedidos', window.location.origin), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(nuevoPedido)
+  });
+  const datos: unknown = await respuesta.json();
+
+  return PedidoSchema.parse(datos);
 }
