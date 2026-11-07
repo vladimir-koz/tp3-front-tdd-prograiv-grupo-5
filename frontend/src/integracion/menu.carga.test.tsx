@@ -1,8 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { delay, http, HttpResponse } from 'msw';
 import { expect, it } from 'vitest';
-import { App } from '../App';
+import { renderizarApp } from '../test/renderizarApp';
 import { server } from '../test/server';
 
 it('muestra un indicador mientras carga el catálogo y después presenta los productos', async () => {
@@ -21,7 +21,7 @@ it('muestra un indicador mientras carga el catálogo y después presenta los pro
     })
   );
 
-  render(<App />);
+  renderizarApp();
 
   expect(screen.getByRole('banner')).toBeInTheDocument();
   expect(screen.getByRole('status')).toHaveTextContent('Cargando menú');
@@ -53,7 +53,7 @@ it('muestra el error de carga y permite recuperar el catálogo al reintentar', a
   );
   const user = userEvent.setup();
 
-  render(<App />);
+  renderizarApp();
 
   expect(await screen.findByRole('alert')).toHaveTextContent('ErrorInterno');
   expect(consultas).toBe(1);

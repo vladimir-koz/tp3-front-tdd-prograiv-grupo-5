@@ -1,7 +1,7 @@
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { beforeEach, expect, it } from 'vitest';
-import { App } from './App';
+import { renderizarApp } from './test/renderizarApp';
 import { server } from './test/server';
 
 beforeEach(() => {
@@ -9,7 +9,7 @@ beforeEach(() => {
 });
 
 it('renderiza la aplicación React', () => {
-  render(<App />);
+  renderizarApp();
   expect(screen.getByRole('heading', { name: 'Cafetería Origen' })).toBeInTheDocument();
 });
 
@@ -18,7 +18,7 @@ it('muestra la mesa indicada en la URL dentro del encabezado', () => {
 
   try {
     window.history.replaceState(null, '', '/?mesa=4');
-    render(<App />);
+    renderizarApp();
 
     const encabezado = screen.getByRole('banner');
     expect(within(encabezado).getByText('Mesa 4')).toBeInTheDocument();
@@ -32,7 +32,7 @@ it('muestra Retiro en barra en el encabezado cuando la URL no tiene mesa', () =>
 
   try {
     window.history.replaceState(null, '', '/');
-    render(<App />);
+    renderizarApp();
 
     const encabezado = screen.getByRole('banner');
     expect(within(encabezado).getByText('Retiro en barra')).toBeInTheDocument();
