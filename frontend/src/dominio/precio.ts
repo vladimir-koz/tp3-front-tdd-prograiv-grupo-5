@@ -1,3 +1,3 @@
-export function formatearPrecio(_monto: number): string {
-  return '';
+export function formatearPrecio(monto: number): string {
+  return `$${monto.toLocaleString('es-AR')}`;
 }
