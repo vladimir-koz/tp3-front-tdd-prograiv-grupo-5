@@ -2,6 +2,15 @@ import { render, screen, within } from '@testing-library/react';
 import { expect, it } from 'vitest';
 import { Encabezado } from './Encabezado';
 
+it('muestra el título Cafetería Origen dentro del encabezado', () => {
+  render(<Encabezado mesa={null} />);
+
+  const encabezado = screen.getByRole('banner');
+  expect(
+    within(encabezado).getByRole('heading', { level: 1, name: 'Cafetería Origen' })
+  ).toBeInTheDocument();
+});
+
 it('muestra Mesa 4 dentro del encabezado cuando recibe mesa={4}', () => {
   render(<Encabezado mesa={4} />);
 
