@@ -11,14 +11,19 @@ interface Props {
 
 export function Menu({ estado, onReintentar, onAgregar }: Props) {
   if (estado.estado === 'cargando') {
-    return <div role="status">Cargando menú</div>;
+    return (
+      <div role="status" className="d-flex align-items-center gap-2 py-4">
+        <span className="spinner-border spinner-border-sm text-primary" aria-hidden="true" />
+        Cargando menú…
+      </div>
+    );
   }
 
   if (estado.estado === 'error') {
     return (
-      <div role="alert">
-        <p>{estado.mensaje}</p>
-        <button type="button" onClick={onReintentar}>
+      <div role="alert" className="alert alert-danger">
+        <p>No se pudo cargar el menú: {estado.mensaje}</p>
+        <button type="button" className="btn btn-outline-danger" onClick={onReintentar}>
           Reintentar
         </button>
       </div>

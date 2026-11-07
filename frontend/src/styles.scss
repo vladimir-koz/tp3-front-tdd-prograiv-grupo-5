@@ -1,4 +1,23 @@
+// Colores de la cafetería: se definen antes de importar Bootstrap.
 $primary: #6b3f2a;
+$secondary: #a47551;
+$success: #4f7a3a;
+$danger: #b23a2e;
 $body-bg: #f7f2ec;
+$body-color: #2b1d14;
+$border-radius: 0.75rem;
 
 @import 'bootstrap/scss/bootstrap';
+
+// Resalta el origen elegido en el selector de café.
+.origen:has(.form-check-input:checked) {
+  border-color: $primary !important;
+  background-color: rgba($primary, 0.06);
+}
+
+// En celulares el label de tamaño "Taza grande" no debe desbordar.
+.btn-group .btn {
+  white-space: nowrap;
+  font-size: 0.9rem;
+  padding-inline: 0.5rem;
+}

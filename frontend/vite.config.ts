@@ -12,6 +12,15 @@ export default defineConfig({
       '/__test__': 'http://localhost:3000'
     }
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        // Bootstrap 5 todavía usa @import y funciones de color viejas de Sass.
+        quietDeps: true,
+        silenceDeprecations: ['import']
+      }
+    }
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts']
