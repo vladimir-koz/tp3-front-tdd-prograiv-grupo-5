@@ -26,6 +26,8 @@ export const ProductoSchema = z.discriminatedUnion('tipo', [
 
 export const ProductosSchema = z.array(ProductoSchema);
 
+export const PedidoSchema = z.object({});
+
 export type Producto = z.infer<typeof ProductoSchema>;
 export type Cafe = Extract<Producto, { tipo: 'expreso' | 'filtrado' }>;
 export type Pasteleria = Extract<Producto, { tipo: 'pasteleria' }>;

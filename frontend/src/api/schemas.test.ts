@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { ProductoSchema, ProductosSchema } from './schemas';
+import { PedidoSchema, ProductoSchema, ProductosSchema } from './schemas';
 
 it('valida el producto 5 del catálogo oficial y conserva los campos que utiliza el menú', () => {
   const respuestaApi: unknown = {
@@ -159,4 +159,21 @@ it('rechaza una lista que contiene un producto inválido', () => {
 
 it('rechaza una respuesta de productos que no es un array', () => {
   expect(ProductosSchema.safeParse(productosValidos[0]).success).toBe(false);
+});
+
+it.each([4, null])('valida un pedido de la API con mesa %s y conserva sus datos', mesa => {
+  const respuestaApi: unknown = {
+    id: 1,
+    mesa,
+    estado: 'pendiente',
+    items: [
+      { productoId: 5, cantidad: 2 },
+      { productoId: 19, cantidad: 1 }
+    ],
+    total: 17220
+  };
+
+  const pedido = PedidoSchema.parse(respuestaApi);
+
+  expect(pedido).toEqual(respuestaApi);
 });
