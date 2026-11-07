@@ -26,3 +26,17 @@ it('muestra la mesa indicada en la URL dentro del encabezado', () => {
     window.history.replaceState(null, '', urlOriginal);
   }
 });
+
+it('muestra Retiro en barra en el encabezado cuando la URL no tiene mesa', () => {
+  const urlOriginal = window.location.href;
+
+  try {
+    window.history.replaceState(null, '', '/');
+    render(<App />);
+
+    const encabezado = screen.getByRole('banner');
+    expect(within(encabezado).getByText('Retiro en barra')).toBeInTheDocument();
+  } finally {
+    window.history.replaceState(null, '', urlOriginal);
+  }
+});
