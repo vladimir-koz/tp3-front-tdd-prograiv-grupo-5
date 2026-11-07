@@ -26,7 +26,16 @@ export const ProductoSchema = z.discriminatedUnion('tipo', [
 
 export const ProductosSchema = z.array(ProductoSchema);
 
-export const PedidoSchema = z.object({});
+export const PedidoSchema = z.object({
+  id: z.number().int().positive(),
+  mesa: z.number().int().positive().nullable(),
+  estado: z.enum(['pendiente', 'en_preparacion', 'entregado']),
+  items: z.array(z.object({
+    productoId: z.number().int().positive(),
+    cantidad: z.number().int().positive()
+  })).min(1),
+  total: z.number().nonnegative()
+});
 
 export type Producto = z.infer<typeof ProductoSchema>;
 export type Cafe = Extract<Producto, { tipo: 'expreso' | 'filtrado' }>;
@@ -34,3 +43,4 @@ export type Pasteleria = Extract<Producto, { tipo: 'pasteleria' }>;
 export type Bebida = Cafe['tipo'];
 export type Tamano = Cafe['tamano'];
 export type Variedad = Cafe['variedad'];
+export type Pedido = z.infer<typeof PedidoSchema>;
