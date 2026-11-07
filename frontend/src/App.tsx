@@ -11,7 +11,6 @@ export function App() {
     <>
       <Encabezado mesa={mesa} />
       <main className="container py-4">
-        <h1>Cafetería Origen</h1>
         <Menu estado={estado} onReintentar={reintentar} />
       </main>
     </>
