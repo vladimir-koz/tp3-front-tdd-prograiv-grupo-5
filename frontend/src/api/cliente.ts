@@ -1,4 +1,4 @@
-import { ProductosSchema, type Producto } from './schemas';
+import { ProductosSchema, type Pedido, type Producto } from './schemas';
 
 export async function obtenerProductos(): Promise<Producto[]> {
   let respuesta: Response;
@@ -20,4 +20,8 @@ export async function obtenerProductos(): Promise<Producto[]> {
   }
 
   return ProductosSchema.parse(datos);
+}
+
+export async function crearPedido(_nuevoPedido: Pick<Pedido, 'mesa' | 'items'>): Promise<Pedido> {
+  throw new Error('Pendiente de implementar crearPedido');
 }
