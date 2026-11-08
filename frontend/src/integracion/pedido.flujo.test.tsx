@@ -131,3 +131,53 @@ it('muestra el error del servidor, conserva el carrito y permite confirmar al re
     window.history.replaceState(null, '', urlOriginal);
   }
 });
+
+it('impide confirmar nuevamente mientras el pedido está pendiente de respuesta', async () => {
+  const urlOriginal = window.location.href;
+  const muffin = productos[18];
+  const pedidoCreado: Pedido = {
+    id: 42,
+    mesa: 4,
+    estado: 'pendiente',
+    items: [{ productoId: muffin.id, cantidad: 1 }],
+    total: muffin.precio
+  };
+  let solicitudes = 0;
+  let responder = () => {};
+  const respuestaPendiente = new Promise<void>(resolve => {
+    responder = resolve;
+  });
+
+  server.use(
+    http.get('*/productos', () => HttpResponse.json(catalogoApi)),
+    http.post('*/pedidos', async () => {
+      solicitudes++;
+      await respuestaPendiente;
+      return HttpResponse.json(pedidoCreado, { status: 201 });
+    })
+  );
+
+  try {
+    window.history.replaceState(null, '', '/?mesa=4');
+    const user = userEvent.setup();
+    renderizarApp();
+
+    await user.click(await screen.findByRole('button', { name: 'Agregar Muffin de chocolate' }));
+    const confirmar = screen.getByRole('button', { name: 'Confirmar pedido' });
+    await user.click(confirmar);
+
+    await waitFor(() => expect(solicitudes).toBe(1));
+    expect(confirmar).toBeDisabled();
+
+    await user.click(confirmar);
+    expect(solicitudes).toBe(1);
+
+    responder();
+
+    expect(await screen.findByRole('heading', { name: 'Pedido #42' })).toBeInTheDocument();
+    expect(solicitudes).toBe(1);
+  } finally {
+    responder();
+    window.history.replaceState(null, '', urlOriginal);
+  }
+});
