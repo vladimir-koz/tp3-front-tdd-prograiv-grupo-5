@@ -64,3 +64,48 @@ it('muestra el error de carga y permite recuperar el catálogo al reintentar', a
   expect(consultas).toBe(2);
   expect(screen.queryByRole('alert')).not.toBeInTheDocument();
 });
+
+it('muestra un mensaje claro y permite reintentar si el catálogo no cumple el contrato', async () => {
+  let consultas = 0;
+  server.use(
+    http.get('*/productos', () => {
+      consultas++;
+      if (consultas === 1) {
+        return HttpResponse.json([
+          { id: 19, tipo: 'pasteleria', nombre: 'Muffin de chocolate', precio: -1 }
+        ]);
+      }
+
+      return HttpResponse.json([
+        { id: 19, tipo: 'pasteleria', nombre: 'Muffin de chocolate', precioBase: 2500, precio: 2500 }
+      ]);
+    })
+  );
+  const user = userEvent.setup();
+
+  renderizarApp();
+
+  const alerta = await screen.findByRole('alert');
+  expect(alerta).toHaveTextContent('La respuesta del servidor no tiene el formato esperado');
+  expect(alerta).not.toHaveTextContent('too_small');
+  expect(screen.queryByText('Muffin de chocolate')).not.toBeInTheDocument();
+
+  await user.click(screen.getByRole('button', { name: 'Reintentar' }));
+
+  expect(await screen.findByText('Muffin de chocolate')).toBeInTheDocument();
+});
+
+it('muestra que no se pudo conectar cuando la API está caída detrás del proxy', async () => {
+  server.use(
+    http.get('*/productos', () =>
+      new HttpResponse(null, { status: 500, headers: { 'Content-Type': 'text/plain' } })
+    )
+  );
+
+  renderizarApp();
+
+  const alerta = await screen.findByRole('alert');
+  expect(alerta).toHaveTextContent('No se pudo conectar con el servidor');
+  expect(alerta).not.toHaveTextContent('JSON');
+  expect(screen.getByRole('button', { name: 'Reintentar' })).toBeInTheDocument();
+});
