@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+playwright-report
+test-results
+data
+**/*.sqlite*
+.git
+.env
+.env.*
+npm-debug.log*
+*.tsbuildinfo
