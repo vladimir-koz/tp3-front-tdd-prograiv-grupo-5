@@ -1,4 +1,9 @@
+import { useState } from 'react';
+import { crearPedido } from './api/cliente';
+import type { Pedido } from './api/schemas';
 import { useCarrito } from './carrito/CarritoContext';
+import { Carrito } from './componentes/Carrito';
+import { Confirmacion } from './componentes/Confirmacion';
 import { Encabezado } from './componentes/Encabezado';
 import { Menu } from './componentes/Menu';
 import { leerMesa } from './dominio/mesa';
@@ -7,13 +12,51 @@ import { useMenu } from './menu/useMenu';
 export function App() {
   const mesa = leerMesa(window.location.search);
   const { estado, reintentar } = useMenu();
-  const { agregar } = useCarrito();
+  const { items, agregar, vaciar } = useCarrito();
+  const [pedido, setPedido] = useState<Pedido | null>(null);
+  const [mensajeError, setMensajeError] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
+
+  async function confirmar() {
+    if (enviando) return;
+
+    setEnviando(true);
+    setMensajeError(null);
+    try {
+      const creado = await crearPedido({
+        mesa,
+        items: items.map(item => ({ productoId: item.producto.id, cantidad: item.cantidad }))
+      });
+      vaciar();
+      setPedido(creado);
+    } catch (error: unknown) {
+      setMensajeError(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
+    } finally {
+      setEnviando(false);
+    }
+  }
 
   return (
     <>
       <Encabezado mesa={mesa} />
       <main className="container py-4">
-        <Menu estado={estado} onReintentar={reintentar} onAgregar={agregar} />
+        {pedido !== null ? (
+          <Confirmacion pedido={pedido} />
+        ) : (
+          <div className="row g-3">
+            <div className="col-12 col-lg-7">
+              <Menu estado={estado} onReintentar={reintentar} onAgregar={agregar} />
+            </div>
+            <div className="col-12 col-lg-5">
+              {mensajeError !== null && (
+                <div role="alert" className="alert alert-danger">
+                  {mensajeError}
+                </div>
+              )}
+              <Carrito onConfirmar={confirmar} enviando={enviando} />
+            </div>
+          </div>
+        )}
       </main>
     </>
   );

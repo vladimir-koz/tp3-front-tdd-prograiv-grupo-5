@@ -3,7 +3,7 @@ import { useCarrito } from '../carrito/CarritoContext';
 import { subtotalCarrito, subtotalItem } from '../carrito/carritoReducer';
 import { formatearPrecio } from '../dominio/precio';
 
-export function Carrito({ onConfirmar }: { onConfirmar: () => void }) {
+export function Carrito({ onConfirmar, enviando = false }: { onConfirmar: () => void; enviando?: boolean }) {
   const id = useId();
   const { items, sumar, restar, quitar } = useCarrito();
   const vacio = items.length === 0;
@@ -62,7 +62,7 @@ export function Carrito({ onConfirmar }: { onConfirmar: () => void }) {
         <button
           type="button"
           className="btn btn-primary w-100"
-          disabled={vacio}
+          disabled={vacio || enviando}
           onClick={onConfirmar}
         >
           Confirmar pedido
