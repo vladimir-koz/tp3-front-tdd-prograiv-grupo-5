@@ -1,5 +1,7 @@
 import { useId } from 'react';
 import { useCarrito } from '../carrito/CarritoContext';
+import { subtotalCarrito, subtotalItem } from '../carrito/carritoReducer';
+import { formatearPrecio } from '../dominio/precio';
 
 export function Carrito({ onConfirmar }: { onConfirmar: () => void }) {
   const id = useId();
@@ -12,7 +14,27 @@ export function Carrito({ onConfirmar }: { onConfirmar: () => void }) {
         <h2 id={`${id}-titulo`} className="h5 card-title">
           Tu pedido
         </h2>
-        {vacio && <p className="text-body-secondary">Tu carrito está vacío</p>}
+        {vacio ? (
+          <p className="text-body-secondary">Tu carrito está vacío</p>
+        ) : (
+          <ul className="list-group list-group-flush mb-3">
+            {items.map(item => (
+              <li key={item.producto.id} aria-label={item.producto.nombre} className="list-group-item px-0">
+                <div className="d-flex flex-wrap justify-content-between gap-2">
+                  <span>{item.producto.nombre}</span>
+                  <span className="fw-semibold text-nowrap">{formatearPrecio(subtotalItem(item))}</span>
+                </div>
+                <div className="mt-2">
+                  Cantidad: <span>{item.cantidad}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="d-flex flex-wrap justify-content-between gap-2">
+          <span>Subtotal orientativo</span>
+          <strong>{formatearPrecio(subtotalCarrito(items))}</strong>
+        </p>
         <button
           type="button"
           className="btn btn-primary w-100"
