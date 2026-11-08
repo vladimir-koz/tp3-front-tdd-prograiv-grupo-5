@@ -41,7 +41,7 @@ export function App() {
       <Encabezado mesa={mesa} />
       <main className="container py-4">
         {pedido !== null ? (
-          <Confirmacion pedido={pedido} />
+          <Confirmacion pedido={pedido} onNuevoPedido={() => setPedido(null)} />
         ) : (
           <div className="row g-3">
             <div className="col-12 col-lg-7">
