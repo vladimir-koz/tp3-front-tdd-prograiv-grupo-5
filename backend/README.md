@@ -122,8 +122,14 @@ Los IDs de pedido y el filtro `?mesa=` deben ser enteros positivos seguros;
 si son inválidos, la respuesta es 400. El filtro lista pedidos por número de
 mesa: no verifica su existencia y devuelve `[]` si no hay coincidencias.
 
-El contrato usa los nombres `mesa`, `tamano` y `gramos`. Los cafés incluyen
-`variedad` con acidez, cuerpo y notas.
+Algunos nombres difieren de la referencia de la consigna; la información es la misma:
+
+| Consigna | Esta API |
+|---|---|
+| `mesaId` | `mesa` (`number \| null`) |
+| `tamanio` | `tamano` |
+| `gramosCafe` | `gramos` |
+| `variedad.descripcion` | `variedad.acidez`, `variedad.cuerpo` y `variedad.notas` (el front arma la descripción) |
 
 ### Ids del catálogo
 
@@ -209,6 +215,9 @@ El PATCH responde 200, conserva ID, mesa, ítems y total, y cambia `estado`
 a `en_preparacion`. Un GET posterior refleja ese cambio.
 
 Para barra, usar el mismo POST omitiendo `mesa` o con `"mesa": null`.
+
+La colección [postman/cafeteria-origen.postman_collection.json](../postman/cafeteria-origen.postman_collection.json)
+incluye ejemplos de productos, pedidos (con mesa, sin mesa y rechazos) y reportes.
 
 ### Reportes
 
