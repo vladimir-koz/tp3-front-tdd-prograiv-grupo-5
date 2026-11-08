@@ -24,7 +24,7 @@ it('consulta el pedido 42 y muestra su estado actualizado desde la confirmación
   );
   const user = userEvent.setup();
 
-  render(<Confirmacion pedido={pedido} />);
+  render(<Confirmacion pedido={pedido} onNuevoPedido={() => {}} />);
 
   expect(screen.getByRole('heading', { name: 'Pedido #42' })).toBeInTheDocument();
   expect(screen.getByText('Pendiente')).toBeInTheDocument();
@@ -52,7 +52,7 @@ it('muestra el error de consulta y conserva los datos anteriores del pedido', as
   );
   const user = userEvent.setup();
 
-  render(<Confirmacion pedido={pedido} />);
+  render(<Confirmacion pedido={pedido} onNuevoPedido={() => {}} />);
 
   expect(screen.getByRole('heading', { name: 'Pedido #42' })).toBeInTheDocument();
   expect(screen.getByText('Pendiente')).toBeInTheDocument();
