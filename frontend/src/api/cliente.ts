@@ -41,6 +41,9 @@ export async function crearPedido(nuevoPedido: Pick<Pedido, 'mesa' | 'items'>): 
   return PedidoSchema.parse(datos);
 }
 
-export async function obtenerPedido(_id: number): Promise<Pedido> {
-  throw new Error('Pendiente de implementar obtenerPedido');
+export async function obtenerPedido(id: number): Promise<Pedido> {
+  const respuesta = await fetch(new URL(`/pedidos/${id}`, window.location.origin));
+  const datos: unknown = await respuesta.json();
+
+  return PedidoSchema.parse(datos);
 }
