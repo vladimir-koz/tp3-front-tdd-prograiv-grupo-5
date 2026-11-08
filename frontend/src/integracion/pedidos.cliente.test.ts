@@ -78,3 +78,13 @@ it('consulta GET /pedidos/42 y devuelve el pedido de la respuesta 200', async ()
   expect(rutaConsultada).toBe('/pedidos/42');
   expect(pedido).toEqual(respuestaApi);
 });
+
+it('rechaza con NoEncontrado cuando GET /pedidos/42 responde HTTP 404', async () => {
+  server.use(
+    http.get('*/pedidos/42', () =>
+      HttpResponse.json({ error: 'NoEncontrado' }, { status: 404 })
+    )
+  );
+
+  await expect(obtenerPedido(42)).rejects.toThrow(new Error('NoEncontrado'));
+});
