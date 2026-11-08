@@ -11,7 +11,7 @@ import { elegirCafe } from '../test/utilidades';
 // Muestra lo que guardó el contexto del carrito, para observarlo sin depender de la UI del minicart.
 function VerCarrito() {
   const { items } = useCarrito();
-  return <output aria-label="carrito">{items.map(p => p.nombre).join(', ')}</output>;
+  return <output aria-label="carrito">{items.map(item => item.producto.nombre).join(', ')}</output>;
 }
 
 const carrito = () => screen.getByRole('status', { name: 'carrito' });
