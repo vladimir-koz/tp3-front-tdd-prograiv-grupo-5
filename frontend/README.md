@@ -62,8 +62,10 @@ con Docker, Nginx. No se necesitan URLs del backend dentro de los componentes.
 
 Los datos de las respuestas exitosas se validan con Zod antes de usarse y los
 tipos `Producto` y `Pedido` se derivan mediante `z.infer`. Una respuesta incompatible
-rechaza la operación. Los errores HTTP conservan el campo `error` de la API;
-una falla de conexión produce «No se pudo conectar con el servidor».
+rechaza la operación con «La respuesta del servidor no tiene el formato esperado».
+Los errores HTTP conservan el campo `error` de la API. Una falla de conexión, o un
+error sin ese formato (por ejemplo, el 500 vacío del proxy de Vite o el 502 de Nginx
+con la API apagada), produce «No se pudo conectar con el servidor».
 
 El cuerpo de creación utiliza los nombres del backend oficial:
 
