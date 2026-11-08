@@ -12,9 +12,15 @@ const ETIQUETAS_ESTADO: Record<Pedido['estado'], string> = {
 export function Confirmacion({ pedido: inicial }: { pedido: Pedido }) {
   const id = useId();
   const [pedido, setPedido] = useState(inicial);
+  const [mensajeError, setMensajeError] = useState<string | null>(null);
 
   async function actualizar() {
-    setPedido(await obtenerPedido(pedido.id));
+    setMensajeError(null);
+    try {
+      setPedido(await obtenerPedido(pedido.id));
+    } catch (error: unknown) {
+      setMensajeError(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
+    }
   }
 
   return (
@@ -29,6 +35,11 @@ export function Confirmacion({ pedido: inicial }: { pedido: Pedido }) {
           <dt>Total</dt>
           <dd className="fw-semibold">{formatearPrecio(pedido.total)}</dd>
         </dl>
+        {mensajeError !== null && (
+          <div role="alert" className="alert alert-danger mt-3">
+            {mensajeError}
+          </div>
+        )}
         <button type="button" className="btn btn-primary mt-3" onClick={actualizar}>
           Actualizar estado
         </button>
