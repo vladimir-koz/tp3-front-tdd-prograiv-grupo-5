@@ -1,25 +1,33 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useReducer, type ReactNode } from 'react';
 import type { Producto } from '../api/schemas';
+import { carritoReducer, type EstadoCarrito } from './carritoReducer';
 
 interface CarritoContextValue {
-  items: Producto[];
+  items: EstadoCarrito;
   agregar: (producto: Producto) => void;
+  sumar: (id: number) => void;
+  restar: (id: number) => void;
+  quitar: (id: number) => void;
+  vaciar: () => void;
 }
 
 const CarritoContext = createContext<CarritoContextValue | null>(null);
 
-// Versión mínima: guarda los productos agregados en memoria.
-// Cuando llegue el minicart se reemplaza por un reducer con cantidades.
 export function CarritoProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<Producto[]>([]);
+  const [items, dispatch] = useReducer(carritoReducer, []);
 
   const agregar = useCallback((producto: Producto) => {
-    // Temporal, para ver lo agregado en el navegador hasta tener el minicart.
-    console.log('Agregado al carrito:', producto);
-    setItems(anteriores => [...anteriores, producto]);
+    dispatch({ tipo: 'agregar', producto });
   }, []);
 
-  const value = useMemo(() => ({ items, agregar }), [items, agregar]);
+  const value = useMemo<CarritoContextValue>(() => ({
+    items,
+    agregar,
+    sumar: id => dispatch({ tipo: 'sumar', id }),
+    restar: id => dispatch({ tipo: 'restar', id }),
+    quitar: id => dispatch({ tipo: 'quitar', id }),
+    vaciar: () => dispatch({ tipo: 'vaciar' })
+  }), [items, agregar, dispatch]);
 
   return <CarritoContext.Provider value={value}>{children}</CarritoContext.Provider>;
 }
