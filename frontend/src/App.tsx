@@ -14,14 +14,20 @@ export function App() {
   const { estado, reintentar } = useMenu();
   const { items, agregar, vaciar } = useCarrito();
   const [pedido, setPedido] = useState<Pedido | null>(null);
+  const [mensajeError, setMensajeError] = useState<string | null>(null);
 
   async function confirmar() {
-    const creado = await crearPedido({
-      mesa,
-      items: items.map(item => ({ productoId: item.producto.id, cantidad: item.cantidad }))
-    });
-    vaciar();
-    setPedido(creado);
+    setMensajeError(null);
+    try {
+      const creado = await crearPedido({
+        mesa,
+        items: items.map(item => ({ productoId: item.producto.id, cantidad: item.cantidad }))
+      });
+      vaciar();
+      setPedido(creado);
+    } catch (error: unknown) {
+      setMensajeError(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
+    }
   }
 
   return (
@@ -36,6 +42,11 @@ export function App() {
               <Menu estado={estado} onReintentar={reintentar} onAgregar={agregar} />
             </div>
             <div className="col-12 col-lg-5">
+              {mensajeError !== null && (
+                <div role="alert" className="alert alert-danger">
+                  {mensajeError}
+                </div>
+              )}
               <Carrito onConfirmar={confirmar} />
             </div>
           </div>
