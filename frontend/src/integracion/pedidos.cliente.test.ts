@@ -42,3 +42,16 @@ it('envía POST /pedidos con mesa e ítems y devuelve el pedido de la respuesta 
   });
   expect(pedido).toEqual(respuestaApi);
 });
+
+it('rechaza con MesaInexistente cuando la API responde HTTP 400', async () => {
+  server.use(
+    http.post('*/pedidos', () =>
+      HttpResponse.json({ error: 'MesaInexistente' }, { status: 400 })
+    )
+  );
+
+  await expect(crearPedido({
+    mesa: 26,
+    items: [{ productoId: 19, cantidad: 1 }]
+  })).rejects.toThrow(new Error('MesaInexistente'));
+});
