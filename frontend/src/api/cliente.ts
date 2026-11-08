@@ -30,5 +30,13 @@ export async function crearPedido(nuevoPedido: Pick<Pedido, 'mesa' | 'items'>): 
   });
   const datos: unknown = await respuesta.json();
 
+  if (!respuesta.ok) {
+    const mensaje =
+      typeof datos === 'object' && datos !== null && 'error' in datos && typeof datos.error === 'string'
+        ? datos.error
+        : `Error ${respuesta.status}`;
+    throw new Error(mensaje);
+  }
+
   return PedidoSchema.parse(datos);
 }
