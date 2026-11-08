@@ -181,3 +181,41 @@ it('impide confirmar nuevamente mientras el pedido está pendiente de respuesta'
     window.history.replaceState(null, '', urlOriginal);
   }
 });
+
+it('envía mesa null para retiro en barra y muestra la confirmación del pedido', async () => {
+  const urlOriginal = window.location.href;
+  const muffin = productos[18];
+  const nuevoPedido: Pick<Pedido, 'mesa' | 'items'> = {
+    mesa: null,
+    items: [{ productoId: muffin.id, cantidad: 1 }]
+  };
+  const pedidoCreado: Pedido = {
+    id: 42,
+    ...nuevoPedido,
+    estado: 'pendiente',
+    total: muffin.precio
+  };
+  let cuerpoRecibido: unknown;
+
+  server.use(
+    http.get('*/productos', () => HttpResponse.json(catalogoApi)),
+    http.post('*/pedidos', async ({ request }) => {
+      cuerpoRecibido = await request.json();
+      return HttpResponse.json(pedidoCreado, { status: 201 });
+    })
+  );
+
+  try {
+    window.history.replaceState(null, '', '/');
+    const user = userEvent.setup();
+    renderizarApp();
+
+    await user.click(await screen.findByRole('button', { name: 'Agregar Muffin de chocolate' }));
+    await user.click(screen.getByRole('button', { name: 'Confirmar pedido' }));
+
+    expect(await screen.findByRole('heading', { name: 'Pedido #42' })).toBeInTheDocument();
+    expect(cuerpoRecibido).toEqual(nuevoPedido);
+  } finally {
+    window.history.replaceState(null, '', urlOriginal);
+  }
+});
