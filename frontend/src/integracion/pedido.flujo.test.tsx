@@ -219,3 +219,34 @@ it('envía mesa null para retiro en barra y muestra la confirmación del pedido'
     window.history.replaceState(null, '', urlOriginal);
   }
 });
+
+it('muestra el rechazo HTTP 400 por mesa inexistente y conserva el carrito', async () => {
+  const urlOriginal = window.location.href;
+  server.use(
+    http.get('*/productos', () => HttpResponse.json(catalogoApi)),
+    http.post('*/pedidos', () =>
+      HttpResponse.json({ error: 'MesaInexistente' }, { status: 400 })
+    )
+  );
+
+  try {
+    window.history.replaceState(null, '', '/?mesa=26');
+    const user = userEvent.setup();
+    renderizarApp();
+
+    await user.click(await screen.findByRole('button', { name: 'Agregar Muffin de chocolate' }));
+    const carrito = screen.getByRole('region', { name: 'Tu pedido' });
+    expect(within(within(carrito).getByRole('listitem', { name: 'Muffin de chocolate' }))
+      .getByText('1')).toBeInTheDocument();
+
+    await user.click(within(carrito).getByRole('button', { name: 'Confirmar pedido' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('MesaInexistente');
+    const item = within(carrito).getByRole('listitem', { name: 'Muffin de chocolate' });
+    expect(within(item).getByText('Muffin de chocolate')).toBeInTheDocument();
+    expect(within(item).getByText('1')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /^Pedido #/ })).not.toBeInTheDocument();
+  } finally {
+    window.history.replaceState(null, '', urlOriginal);
+  }
+});
