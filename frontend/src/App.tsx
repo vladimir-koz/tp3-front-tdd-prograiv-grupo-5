@@ -15,8 +15,12 @@ export function App() {
   const { items, agregar, vaciar } = useCarrito();
   const [pedido, setPedido] = useState<Pedido | null>(null);
   const [mensajeError, setMensajeError] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
 
   async function confirmar() {
+    if (enviando) return;
+
+    setEnviando(true);
     setMensajeError(null);
     try {
       const creado = await crearPedido({
@@ -27,6 +31,8 @@ export function App() {
       setPedido(creado);
     } catch (error: unknown) {
       setMensajeError(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
+    } finally {
+      setEnviando(false);
     }
   }
 
@@ -47,7 +53,7 @@ export function App() {
                   {mensajeError}
                 </div>
               )}
-              <Carrito onConfirmar={confirmar} />
+              <Carrito onConfirmar={confirmar} enviando={enviando} />
             </div>
           </div>
         )}
