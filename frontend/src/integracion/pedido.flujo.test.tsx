@@ -86,3 +86,48 @@ it('envía el pedido de la mesa 4, muestra la confirmación y vacía el carrito 
     window.history.replaceState(null, '', urlOriginal);
   }
 });
+
+it('muestra el error del servidor, conserva el carrito y permite confirmar al reintentar', async () => {
+  const urlOriginal = window.location.href;
+  const muffin = productos[18];
+  const pedidoCreado: Pedido = {
+    id: 42,
+    mesa: 4,
+    estado: 'pendiente',
+    items: [{ productoId: muffin.id, cantidad: 1 }],
+    total: muffin.precio
+  };
+
+  server.use(
+    http.get('*/productos', () => HttpResponse.json(catalogoApi)),
+    http.post('*/pedidos', () =>
+      HttpResponse.json({ error: 'ErrorInterno' }, { status: 500 })
+    )
+  );
+
+  try {
+    window.history.replaceState(null, '', '/?mesa=4');
+    const user = userEvent.setup();
+    renderizarApp(<ObservarCarrito />);
+
+    await user.click(await screen.findByRole('button', { name: 'Agregar Muffin de chocolate' }));
+    await user.click(screen.getByRole('button', { name: 'Confirmar pedido' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('ErrorInterno');
+    const carrito = screen.getByRole('region', { name: 'Tu pedido' });
+    const item = within(carrito).getByRole('listitem', { name: 'Muffin de chocolate' });
+    expect(within(item).getByText('1')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /^Pedido #/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Entradas del carrito' })).toHaveTextContent(/^1$/);
+
+    server.use(
+      http.post('*/pedidos', () => HttpResponse.json(pedidoCreado, { status: 201 }))
+    );
+    await user.click(within(carrito).getByRole('button', { name: 'Confirmar pedido' }));
+
+    expect(await screen.findByRole('heading', { name: 'Pedido #42' })).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Entradas del carrito' })).toHaveTextContent(/^0$/);
+  } finally {
+    window.history.replaceState(null, '', urlOriginal);
+  }
+});
