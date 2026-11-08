@@ -88,3 +88,18 @@ it('rechaza con NoEncontrado cuando GET /pedidos/42 responde HTTP 404', async ()
 
   await expect(obtenerPedido(42)).rejects.toThrow(new Error('NoEncontrado'));
 });
+
+it('informa un mensaje comprensible si falla la conexión durante POST /pedidos', async () => {
+  server.use(http.post('*/pedidos', () => HttpResponse.error()));
+
+  await expect(crearPedido({
+    mesa: 4,
+    items: [{ productoId: 19, cantidad: 1 }]
+  })).rejects.toThrow(new Error('No se pudo conectar con el servidor'));
+});
+
+it('informa un mensaje comprensible si falla la conexión durante GET /pedidos/42', async () => {
+  server.use(http.get('*/pedidos/42', () => HttpResponse.error()));
+
+  await expect(obtenerPedido(42)).rejects.toThrow(new Error('No se pudo conectar con el servidor'));
+});
