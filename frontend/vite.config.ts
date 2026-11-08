@@ -1,15 +1,17 @@
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+
+const apiUrl = process.env.API_URL ?? 'http://localhost:3000';
 
 export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/health': 'http://localhost:3000',
-      '/productos': 'http://localhost:3000',
-      '/pedidos': 'http://localhost:3000',
-      '/reportes': 'http://localhost:3000',
-      '/__test__': 'http://localhost:3000'
+      '/health': apiUrl,
+      '/productos': apiUrl,
+      '/pedidos': apiUrl,
+      '/reportes': apiUrl,
+      '/__test__': apiUrl
     }
   },
   css: {
@@ -22,6 +24,7 @@ export default defineConfig({
     }
   },
   test: {
+    exclude: [...configDefaults.exclude, 'e2e/**'],
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts']
   }

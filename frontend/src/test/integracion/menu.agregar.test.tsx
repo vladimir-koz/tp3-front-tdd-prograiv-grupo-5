@@ -2,11 +2,11 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useCarrito } from '../carrito/CarritoContext';
-import { catalogoApi } from '../test/fixtures';
-import { renderizarApp } from '../test/renderizarApp';
-import { server } from '../test/server';
-import { elegirCafe } from '../test/utilidades';
+import { useCarrito } from '../../carrito/CarritoContext';
+import { catalogoApi } from '../fixtures';
+import { renderizarApp } from '../renderizarApp';
+import { server } from '../server';
+import { elegirCafe } from '../utilidades';
 
 // Muestra lo que guardó el contexto del carrito, para observarlo sin depender de la UI del minicart.
 function VerCarrito() {
