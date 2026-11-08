@@ -9,7 +9,12 @@ const ETIQUETAS_ESTADO: Record<Pedido['estado'], string> = {
   entregado: 'Entregado'
 };
 
-export function Confirmacion({ pedido: inicial }: { pedido: Pedido }) {
+interface Props {
+  pedido: Pedido;
+  onNuevoPedido: () => void;
+}
+
+export function Confirmacion({ pedido: inicial, onNuevoPedido }: Props) {
   const id = useId();
   const [pedido, setPedido] = useState(inicial);
   const [mensajeError, setMensajeError] = useState<string | null>(null);
@@ -40,9 +45,14 @@ export function Confirmacion({ pedido: inicial }: { pedido: Pedido }) {
             {mensajeError}
           </div>
         )}
-        <button type="button" className="btn btn-primary mt-3" onClick={actualizar}>
-          Actualizar estado
-        </button>
+        <div className="d-flex flex-wrap gap-2 mt-3">
+          <button type="button" className="btn btn-primary" onClick={actualizar}>
+            Actualizar estado
+          </button>
+          <button type="button" className="btn btn-outline-primary" onClick={onNuevoPedido}>
+            Hacer otro pedido
+          </button>
+        </div>
       </div>
     </section>
   );
