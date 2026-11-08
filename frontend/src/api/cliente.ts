@@ -40,3 +40,7 @@ export async function crearPedido(nuevoPedido: Pick<Pedido, 'mesa' | 'items'>): 
 
   return PedidoSchema.parse(datos);
 }
+
+export async function obtenerPedido(_id: number): Promise<Pedido> {
+  throw new Error('Pendiente de implementar obtenerPedido');
+}

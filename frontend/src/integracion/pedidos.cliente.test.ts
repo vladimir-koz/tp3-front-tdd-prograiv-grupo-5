@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { expect, it } from 'vitest';
-import { crearPedido } from '../api/cliente';
+import { crearPedido, obtenerPedido } from '../api/cliente';
 import type { Pedido } from '../api/schemas';
 import { server } from '../test/server';
 
@@ -54,4 +54,27 @@ it('rechaza con MesaInexistente cuando la API responde HTTP 400', async () => {
     mesa: 26,
     items: [{ productoId: 19, cantidad: 1 }]
   })).rejects.toThrow(new Error('MesaInexistente'));
+});
+
+it('consulta GET /pedidos/42 y devuelve el pedido de la respuesta 200', async () => {
+  const respuestaApi: Pedido = {
+    id: 42,
+    mesa: 4,
+    estado: 'en_preparacion',
+    items: [{ productoId: 19, cantidad: 1 }],
+    total: 2500
+  };
+  let rutaConsultada = '';
+
+  server.use(
+    http.get('*/pedidos/:id', ({ request }) => {
+      rutaConsultada = new URL(request.url).pathname;
+      return HttpResponse.json(respuestaApi, { status: 200 });
+    })
+  );
+
+  const pedido = await obtenerPedido(42);
+
+  expect(rutaConsultada).toBe('/pedidos/42');
+  expect(pedido).toEqual(respuestaApi);
 });
