@@ -2,11 +2,11 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { expect, it } from 'vitest';
-import type { Pedido } from '../api/schemas';
-import { useCarrito } from '../carrito/CarritoContext';
-import { catalogoApi, productos } from '../test/fixtures';
-import { renderizarApp } from '../test/renderizarApp';
-import { server } from '../test/server';
+import type { Pedido } from '../../api/schemas';
+import { useCarrito } from '../../carrito/CarritoContext';
+import { catalogoApi, productos } from '../fixtures';
+import { renderizarApp } from '../renderizarApp';
+import { server } from '../server';
 
 function ObservarCarrito() {
   const { items } = useCarrito();

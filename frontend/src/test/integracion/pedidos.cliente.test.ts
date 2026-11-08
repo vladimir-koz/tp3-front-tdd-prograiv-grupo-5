@@ -1,8 +1,8 @@
 import { http, HttpResponse } from 'msw';
 import { expect, it } from 'vitest';
-import { crearPedido, obtenerPedido } from '../api/cliente';
-import type { Pedido } from '../api/schemas';
-import { server } from '../test/server';
+import { crearPedido, obtenerPedido } from '../../api/cliente';
+import type { Pedido } from '../../api/schemas';
+import { server } from '../server';
 
 it('envía POST /pedidos con mesa e ítems y devuelve el pedido de la respuesta 201', async () => {
   const nuevoPedido: Pick<Pedido, 'mesa' | 'items'> = {

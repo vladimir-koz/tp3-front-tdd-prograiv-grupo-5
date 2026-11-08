@@ -2,9 +2,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { expect, it } from 'vitest';
-import type { Pedido } from '../api/schemas';
-import { Confirmacion } from '../componentes/Confirmacion';
-import { server } from '../test/server';
+import type { Pedido } from '../../api/schemas';
+import { Confirmacion } from '../../componentes/Confirmacion';
+import { server } from '../server';
 
 it('consulta el pedido 42 y muestra su estado actualizado desde la confirmación', async () => {
   const pedido: Pedido = {

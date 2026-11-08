@@ -2,8 +2,8 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { delay, http, HttpResponse } from 'msw';
 import { expect, it } from 'vitest';
-import { renderizarApp } from '../test/renderizarApp';
-import { server } from '../test/server';
+import { renderizarApp } from '../renderizarApp';
+import { server } from '../server';
 
 it('muestra un indicador mientras carga el catálogo y después presenta los productos', async () => {
   server.use(

@@ -1,8 +1,8 @@
 import { http, HttpResponse } from 'msw';
 import { expect, it } from 'vitest';
-import { obtenerProductos } from '../api/cliente';
-import { ProductosSchema } from '../api/schemas';
-import { server } from '../test/server';
+import { obtenerProductos } from '../../api/cliente';
+import { ProductosSchema } from '../../api/schemas';
+import { server } from '../server';
 
 const productoApi = {
   id: 5,
