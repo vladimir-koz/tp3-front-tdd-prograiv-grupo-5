@@ -23,11 +23,18 @@ export async function obtenerProductos(): Promise<Producto[]> {
 }
 
 export async function crearPedido(nuevoPedido: Pick<Pedido, 'mesa' | 'items'>): Promise<Pedido> {
-  const respuesta = await fetch(new URL('/pedidos', window.location.origin), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(nuevoPedido)
-  });
+  let respuesta: Response;
+
+  try {
+    respuesta = await fetch(new URL('/pedidos', window.location.origin), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(nuevoPedido)
+    });
+  } catch {
+    throw new Error('No se pudo conectar con el servidor');
+  }
+
   const datos: unknown = await respuesta.json();
 
   if (!respuesta.ok) {
@@ -42,7 +49,14 @@ export async function crearPedido(nuevoPedido: Pick<Pedido, 'mesa' | 'items'>): 
 }
 
 export async function obtenerPedido(id: number): Promise<Pedido> {
-  const respuesta = await fetch(new URL(`/pedidos/${id}`, window.location.origin));
+  let respuesta: Response;
+
+  try {
+    respuesta = await fetch(new URL(`/pedidos/${id}`, window.location.origin));
+  } catch {
+    throw new Error('No se pudo conectar con el servidor');
+  }
+
   const datos: unknown = await respuesta.json();
 
   if (!respuesta.ok) {
