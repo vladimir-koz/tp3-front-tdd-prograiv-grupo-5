@@ -103,3 +103,41 @@ it('informa un mensaje comprensible si falla la conexión durante GET /pedidos/4
 
   await expect(obtenerPedido(42)).rejects.toThrow(new Error('No se pudo conectar con el servidor'));
 });
+
+it('informa que no se pudo conectar si POST /pedidos responde 502 con HTML', async () => {
+  server.use(
+    http.post('*/pedidos', () => HttpResponse.html('<h1>502 Bad Gateway</h1>', { status: 502 }))
+  );
+
+  await expect(crearPedido({
+    mesa: 4,
+    items: [{ productoId: 19, cantidad: 1 }]
+  })).rejects.toThrow(new Error('No se pudo conectar con el servidor'));
+});
+
+it('rechaza con un mensaje claro un pedido creado que no cumple el contrato', async () => {
+  server.use(
+    http.post('*/pedidos', () =>
+      HttpResponse.json({ id: 42, mesa: 4, estado: 'desconocido', items: [], total: -1 }, { status: 201 })
+    )
+  );
+
+  await expect(crearPedido({
+    mesa: 4,
+    items: [{ productoId: 19, cantidad: 1 }]
+  })).rejects.toThrow(new Error('La respuesta del servidor no tiene el formato esperado'));
+});
+
+it('informa que no se pudo conectar si GET /pedidos/42 responde 500 sin cuerpo JSON', async () => {
+  server.use(http.get('*/pedidos/42', () => new HttpResponse(null, { status: 500 })));
+
+  await expect(obtenerPedido(42)).rejects.toThrow(new Error('No se pudo conectar con el servidor'));
+});
+
+it('rechaza con un mensaje claro un pedido consultado que no cumple el contrato', async () => {
+  server.use(http.get('*/pedidos/42', () => HttpResponse.json({ id: 42 }, { status: 200 })));
+
+  await expect(obtenerPedido(42)).rejects.toThrow(
+    new Error('La respuesta del servidor no tiene el formato esperado')
+  );
+});
