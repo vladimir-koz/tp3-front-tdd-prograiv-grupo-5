@@ -43,3 +43,31 @@ it('muestra el producto agrupado, su cantidad y los subtotales orientativos', as
   expect(screen.getByText('Subtotal orientativo').parentElement).toHaveTextContent('$5.000');
   expect(screen.getByRole('button', { name: 'Confirmar pedido' })).toBeEnabled();
 });
+
+it('permite sumar, restar y quitar el producto desde los controles del carrito', async () => {
+  const user = userEvent.setup();
+  render(
+    <CarritoProvider>
+      <AgregarMuffin />
+      <Carrito onConfirmar={vi.fn()} />
+    </CarritoProvider>
+  );
+
+  const agregar = screen.getByRole('button', { name: 'Agregar muffin de prueba' });
+  await user.click(agregar);
+  await user.click(agregar);
+
+  const item = screen.getByRole('listitem', { name: 'Muffin de chocolate' });
+  expect(within(item).getByText('2')).toBeInTheDocument();
+
+  await user.click(screen.getByRole('button', { name: 'Sumar Muffin de chocolate' }));
+  expect(within(item).getByText('3')).toBeInTheDocument();
+
+  await user.click(screen.getByRole('button', { name: 'Restar Muffin de chocolate' }));
+  expect(within(item).getByText('2')).toBeInTheDocument();
+
+  await user.click(screen.getByRole('button', { name: 'Quitar Muffin de chocolate' }));
+  expect(screen.queryByRole('listitem', { name: 'Muffin de chocolate' })).not.toBeInTheDocument();
+  expect(screen.getByText('Tu carrito está vacío')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Confirmar pedido' })).toBeDisabled();
+});
