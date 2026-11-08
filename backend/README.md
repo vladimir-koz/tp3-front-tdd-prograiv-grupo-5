@@ -37,8 +37,12 @@ npm start            # ejecuta dist/src/server.js
 
 El puerto predeterminado es 3000; se puede cambiar mediante `PORT`.
 
-El frontend se comunica con la API mediante el proxy de
-`frontend/vite.config.ts`, configurado hacia `http://localhost:3000`.
+En desarrollo, el frontend se comunica con la API mediante el proxy de
+`frontend/vite.config.ts`, cuyo destino predeterminado es `http://localhost:3000`.
+La variable `API_URL` permite cambiar ese destino; los E2E del frontend utilizan
+el puerto 4000. Con Docker Compose, Nginx redirige las solicitudes a
+`backend:3000`, sin publicar el puerto de la API al host. Ver el
+[README principal](../README.md) para ejecutar ambos servicios con Docker.
 
 ## Persistencia y mesas
 
